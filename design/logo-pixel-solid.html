@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MicroStudio — #7 Pixel M · solid colors</title>
+<style>
+  :root{ --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3a; --text:#e8eaf0; --muted:#9aa3b2; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:36px}
+  h1{font-size:24px;font-weight:800}
+  .sub{color:var(--muted);margin:8px 0 28px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px 16px 16px;cursor:pointer;transition:.15s;position:relative}
+  .card:hover{border-color:var(--text);transform:translateY(-3px);box-shadow:0 12px 34px rgba(0,0,0,.45)}
+  .mark{width:120px;height:120px;margin:2px auto 16px;display:flex;align-items:center;justify-content:center}
+  .mark svg{width:104px;height:104px;display:block}
+  .num{position:absolute;top:12px;left:14px;font-size:11px;font-weight:700;color:var(--muted);background:var(--panel2);border:1px solid var(--border);padding:3px 9px;border-radius:999px}
+  .name{font-size:14px;font-weight:700;text-align:center}
+  .desc{font-size:11.5px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.45}
+  footer{margin-top:30px;color:var(--muted);font-size:13px;text-align:center}
+  .swarn{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;padding:2px 8px;border-radius:999px;border:1px solid #ff9f0a;color:#ffc25c;margin-top:8px}
+</style>
+</head>
+<body>
+  <h1>#7 · Pixel M — solid color</h1>
+  <p class="sub">Flat #7 mosaic-M, one solid fill. Reply with a letter (A–D).</p>
+  <div class="grid">
+
+    <!-- A · solid red 7 -->
+    <div class="card"><span class="num">A</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#ef4444"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2"/><rect x="44" y="8" width="10" height="10" rx="2"/><rect x="8" y="26" width="10" height="10" rx="2"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2"/><rect x="8" y="44" width="10" height="10" rx="2"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Red</div><div class="desc">Flat red — the classic #7 look, now solid.</div>
+    </div>
+
+    <!-- B -->
+    <div class="card"><span class="num">B</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#22d3ee"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2"/><rect x="44" y="8" width="10" height="10" rx="2"/><rect x="8" y="26" width="10" height="10" rx="2"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2"/><rect x="8" y="44" width="10" height="10" rx="2"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Cyan</div><div class="desc">Flat cyan — matches the app accent.</div>
+    </div>
+
+    <!-- C -->
+    <div class="card"><span class="num">C</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#34d399"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2"/><rect x="44" y="8" width="10" height="10" rx="2"/><rect x="8" y="26" width="10" height="10" rx="2"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2"/><rect x="8" y="44" width="10" height="10" rx="2"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Emerald</div><div class="desc">Flat emerald — the original #7 fill.</div>
+    </div>
+
+    <!-- D -->
+    <div class="card"><span class="num">D</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#e5e7eb"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2"/><rect x="44" y="8" width="10" height="10" rx="2"/><rect x="8" y="26" width="10" height="10" rx="2"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2"/><rect x="8" y="44" width="10" height="10" rx="2"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">White</div><div class="desc">Flat light — clean, works on any dark app bar.</div>
+    </div>
+
+  </div>
+  <div style="text-align:center"><span class="swarn">Reply with a letter (A–D) or a custom solid hex</span></div>
+  <footer>MicroStudio — No.7 Pixel M · solid board</footer>
+</body>
+</html>

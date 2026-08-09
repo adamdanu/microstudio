@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MicroStudio — #7 Pixel Grid · colors</title>
+<style>
+  :root{ --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3a; --text:#e8eaf0; --muted:#9aa3b2; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:36px}
+  h1{font-size:24px;font-weight:800}
+  .sub{color:var(--muted);margin:8px 0 28px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px 16px 16px;cursor:pointer;transition:.15s;position:relative}
+  .card:hover{border-color:var(--text);transform:translateY(-3px);box-shadow:0 12px 34px rgba(0,0,0,.45)}
+  .mark{width:120px;height:120px;margin:2px auto 16px;display:flex;align-items:center;justify-content:center}
+  .mark svg{width:104px;height:104px;display:block}
+  .num{position:absolute;top:12px;left:14px;font-size:11px;font-weight:700;color:var(--muted);background:var(--panel2);border:1px solid var(--border);padding:3px 9px;border-radius:999px}
+  .name{font-size:14px;font-weight:700;text-align:center}
+  .desc{font-size:11.5px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.45}
+  .swatches{display:flex;gap:6px;justify-content:center;margin-top:12px}
+  .sw{width:16px;height:16px;border-radius:5px;border:1px solid rgba(255,255,255,.15)}
+  footer{margin-top:30px;color:var(--muted);font-size:13px;text-align:center}
+
+  .swarn{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;padding:2px 8px;border-radius:999px;border:1px solid #ff9f0a;color:#ffc25c;margin-top:8px}
+</style>
+</head>
+<body>
+  <h1>No.7 · Pixel Grid — colorways</h1>
+  <p class="sub">Same mosaic-M mark, 8 palettes. Reply with the letter (A–H).</p>
+  <div class="grid">
+
+    <div class="card"><span class="num">A</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#22d3ee"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#ff3b30"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Cyan</div><div class="desc">Matches the app accent — single-tone monochromat.</div>
+      <div class="swatches"><span class="sw" style="background:#22d3ee"></span><span class="sw" style="background:#ff3b30"></span></div>
+    </div>
+
+    <div class="card"><span class="num">B</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#38bdf8"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#ff3b30"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Sky</div><div class="desc">Softer, airy blue — photography-set mood.</div>
+      <div class="swatches"><span class="sw" style="background:#7dd3fc"></span><span class="sw" style="background:#ef4444"></span></div>
+    </div>
+
+    <div class="card"><span class="num">C</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#8b5cf6"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#ff3b30"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Violet</div><div class="desc">Creative-focus purple, premium dark-mode pop.</div>
+      <div class="swatches"><span class="sw" style="background:#a78bfa"></span><span class="sw" style="background:#f43f5e"></span></div>
+    </div>
+
+    <div class="card"><span class="num">D</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#f43f5e"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#fbbf24"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Rose</div><div class="desc">Warm rose + gold accent — energetic stock feel.</div>
+      <div class="swatches"><span class="sw" style="background:#fb7185"></span><span class="sw" style="background:#fbbf24"></span></div>
+    </div>
+
+    <div class="card"><span class="num">E</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#34d399"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#ff3b30"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Emerald (current)</div><div class="desc">The palette from the original #7 for comparison.</div>
+      <div class="swatches"><span class="sw" style="background:#34d399"></span><span class="sw" style="background:#ff3b30"></span></div>
+    </div>
+
+    <div class="card"><span class="num">F</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#fb923c"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#f43f5e"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Ember</div><div class="desc">Warm sunset mix — roasted coral/orange.</div>
+      <div class="swatches"><span class="sw" style="background:#fdba74"></span><span class="sw" style="background:#fb7185"></span></div>
+    </div>
+
+    <div class="card"><span class="num">G</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#a3e635"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#22d3ee"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Lime-ice</div><div class="desc">Fresh lime + cyan — cool, bright, "studio-light".</div>
+      <div class="swatches"><span class="sw" style="background:#bef264"></span><span class="sw" style="background:#67e8f9"></span></div>
+    </div>
+
+    <div class="card"><span class="num">H</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#f59e0b"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#ef4444"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".6"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".6"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">Solar</div><div class="desc">Warm gold + red — stock trade-fire energy.</div>
+      <div class="swatches"><span class="sw" style="background:#fbbf24"></span><span class="sw" style="background:#f87171"></span></div>
+    </div>
+
+  </div>
+  <div style="text-align:center"><span class="swarn">Reply with a letter A–H (or 'custom' + hex) to lock the palette</span></div>
+  <footer>MicroStudio — No.7 Pixel Grid · color board</footer>
+</body>
+</html>

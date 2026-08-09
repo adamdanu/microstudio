@@ -1,0 +1,140 @@
+"use client"
+
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+
+export type Lang = "en" | "id"
+
+type Dict = Record<string, { en: string; id: string }>
+
+const D: Dict = {
+  // common
+  signIn: { en: "Sign in", id: "Masuk" },
+  backLanding: { en: "← Back to landing", id: "← Kembali ke beranda" },
+  username: { en: "Username", id: "Nama pengguna" },
+  password: { en: "Password", id: "Kata sandi" },
+  adminTag: { en: "Microstock Tag Optimizer — admin", id: "Microstock Tag Optimizer — admin" },
+  signInBtn: { en: "Sign in →", id: "Masuk →" },
+  signingIn: { en: "Signing in…", id: "Masuk…" },
+  invalidCreds: { en: "Invalid username or password", id: "Nama pengguna atau kata sandi salah" },
+  tooMany: { en: "Too many attempts. Try again later.", id: "Terlalu banyak percobaan. Coba lagi nanti." },
+  oops: { en: "Something went wrong", id: "Terjadi kesalahan" },
+
+  // landing
+  hero1: { en: "Stop guessing tags.", id: "Berhenti menebak tag." },
+  hero2: { en: "Let AI do the SEO.", id: "Biarkan AI yang mengurus SEO." },
+  heroSub: { en: "MicroStudio turns one photo into submission-ready Adobe Stock & Shutterstock metadata — titles, ordered keywords and categories in English, Deutsch & العربية.", id: "MicroStudio mengubah satu foto menjadi metadata siap-unggah Adobe Stock & Shutterstock — judul, kata kunci terurut, dan kategori dalam bahasa Inggris, Jerman & Arab." },
+  openStudio: { en: "Open the Studio →", id: "Buka Studio →" },
+  builtNote: { en: "Built on a decade of selling stock photography", id: "Dibangun di atas pengalaman menjual foto stok" },
+  fTags: { en: "Tags that sell", id: "Tag yang terjual" },
+  fTagsD: { en: "Metadata tuned for the Adobe Stock & Shutterstock catalogs — not generic filler.", id: "Metadata disesuaikan dengan katalog Adobe Stock & Shutterstock — bukan isian umum." },
+  fLangs: { en: "One image, three languages", id: "Satu foto, tiga bahasa" },
+  fLangsD: { en: "English · Deutsch · العربية — keywords and titles in every market, instantly.", id: "Inggris · Jerman · Arab — kata kunci dan judul di setiap pasar, seketika." },
+  fCsv: { en: "Copy or CSV", id: "Salin atau CSV" },
+  fCsvD: { en: "Paste anywhere, or export rows ready for the upload sheets.", id: "Tempel di mana saja, atau ekspor baris siap untuk lembar unggahan." },
+  adminSignIn: { en: "Admin sign in", id: "Masuk admin" },
+
+  // studio
+  aiSettings: { en: "AI Settings", id: "Pengaturan AI" },
+  logOut: { en: "Log out", id: "Keluar" },
+  stopTagging: { en: "Stop Tagging", id: "Hentikan Penandaan" },
+  continueTag: { en: "Continue Tagging", id: "Lanjutkan Penandaan" },
+  batchTagging: { en: "Batch Tagging", id: "Penandaan Massal" },
+  downloadCsv: { en: "Download CSV", id: "Unduh CSV" },
+  uploadPhotos: { en: "Upload Photos", id: "Unggah Foto" },
+  optimizedMeta: { en: "Optimized Metadata", id: "Metadata Optimal" },
+  uploadPhoto1: { en: "1 · Upload your photo", id: "1 · Unggah foto" },
+  dropReplace: { en: "Drop a new image to replace · click to change", id: "Jatuhkan foto baru untuk mengganti · klik untuk mengubah" },
+  dropHere: { en: "Drop images here", id: "Jatuhkan foto di sini" },
+  dropOrBrowse: { en: "or click to browse · PNG, JPG", id: "atau klik untuk pilih · PNG, JPG" },
+  remove: { en: "Remove", id: "Hapus" },
+  generateMeta: { en: "Generate Metadata", id: "Buat Metadata" },
+  generatingMeta: { en: "Generating optimized metadata…", id: "Membuat metadata yang dioptimalkan…" },
+  hintGenerate: { en: "Drop image(s), press Generate — analysis runs against your configured AI provider (vision).", id: "Jatuhkan foto, tekan Buat — analisis berjalan terhadap penyedia AI yang dikonfigurasi (visi)." },
+  addMorePhotos: { en: "+ Add more photos", id: "+ Tambah foto lagi" },
+  analyzingImage: { en: "Analyzing image…", id: "Menganalisis foto…" },
+  failedNote: { en: "The provider couldn't read this image — retry the batch or re-drop it.", id: "Penyedia tidak dapat membaca foto ini — coba lagi atau unggah ulang." },
+  failedNote1: { en: " failed to analyze", id: " gagal dianalisis" },
+  failedNote2: { en: "Tap download CSV for the rest, or re-drop them.", id: "Unduh CSV untuk sisanya, atau unggah ulang." },
+  csvLangNote: { en: "CSV downloads respect the selected language", id: "Unduhan CSV mengikuti bahasa yang dipilih" },
+  csvPickLang: { en: "Choose a language for this CSV", id: "Pilih bahasa untuk CSV ini" },
+  csvPerSecond: { en: "Both Adobe & Shutterstock CSVs are generated in one pass", id: "Kedua CSV Adobe & Shutterstock dibuat dalam satu proses" },
+  emptyDrop: { en: "Drop an image to generate metadata", id: "Jatuhkan foto untuk membuat metadata" },
+  sAnalyze: { en: "Analyze image", id: "Analisis foto" },
+  sTitle: { en: "Write title", id: "Tulis judul" },
+  sKeywords: { en: "Rank keywords", id: "Urutkan kata kunci" },
+  sCategory: { en: "Pick category", id: "Pilih kategori" },
+  analyzedBy: { en: "Analyzed by", id: "Dianalisis oleh" },
+  titleLabel: { en: "Title", id: "Judul" },
+  descriptionLabel: { en: "Description", id: "Deskripsi" },
+  keywordsLabel: { en: "Keywords", id: "Kata kunci" },
+  kwRequired: { en: "7–50 required", id: "7–50 wajib" },
+  kwFirst10: { en: "first 10 highlighted most weight", id: "10 pertama paling berpengaruh" },
+  addKeyword: { en: "+ add keyword", id: "+ tambah kata kunci" },
+  categoryReq: { en: "Category (required)", id: "Kategori (wajib)" },
+  categoriesReq: { en: "Categories (1 required, 2nd optional)", id: "Kategori (1 wajib, ke-2 opsional)" },
+  selectCategory: { en: "Select a category", id: "Pilih kategori" },
+  selectFirst: { en: "Select first (primary)", id: "Pilih pertama (utama)" },
+  noSecond: { en: "No second category", id: "Tanpa kategori kedua" },
+  copyTitle: { en: "Copy {L} title", id: "Salin judul {L}" },
+  copyKw: { en: "Copy {L} keywords", id: "Salin kata kunci {L}" },
+  copyCsvEn: { en: "Copy CSV (EN)", id: "Salin CSV (EN)" },
+  regenerate: { en: "↻ Regenerate", id: "↻ Buat Ulang" },
+  regenerating: { en: "Regenerating…", id: "Membuat ulang…" },
+  hintAuto: { en: "Auto-suggested by the model — same content, translated. Review before submitting.", id: "Saran otomatis dari model — konten sama, diterjemahkan. Periksa sebelum mengirim." },
+  hintAdobe: { en: "First 10 keywords carry the most weight on Adobe Stock.", id: "10 kata kunci pertama paling berpengaruh di Adobe Stock." },
+  hintSS: { en: "Shutterstock requires 7–50 keywords, a news-headline description, and 1–2 categories on submit.", id: "Shutterstock mewajibkan 7–50 kata kunci, deskripsi berita, dan 1–2 kategori saat mengirim." },
+  capabilities: { en: "Capabilities", id: "Kemampuan" },
+  capAdobe21: { en: "✓ 21 official Adobe categories", id: "✓ 21 kategori resmi Adobe" },
+  cap70: { en: "✓ ≤ 70 char title", id: "✓ Judul maks. 70 karakter" },
+  cap1545: { en: "✓ 15–45 keywords", id: "✓ 15–45 kata kunci" },
+  capMulti: { en: "✓ Multi-provider", id: "✓ Multi-penyedia" },
+  capCSV: { en: "✓ CSV-ready export", id: "✓ Ekspor siap CSV" },
+  capSS26: { en: "✓ 26 official Shutterstock categories", id: "✓ 26 kategori resmi Shutterstock" },
+  capSSkw: { en: "✓ 7–50 keywords", id: "✓ 7–50 kata kunci" },
+  capSSnews: { en: "✓ News-headline description (2048ch)", id: "✓ Deskripsi berita (2048 karakter)" },
+  capSSime: { en: "✓ Illustration / Mature / Editorial", id: "✓ Ilustrasi / Dewasa / Editorial" },
+
+  // settings
+  settingsTitle: { en: "AI Provider Settings", id: "Pengaturan Penyedia AI" },
+  fallbackPriority: { en: "Fallback Priority", id: "Prioritas Cadangan" },
+  enableAtLeast: { en: "Enable at least one provider to enable fallback.", id: "Aktifkan minimal satu penyedia untuk mengaktifkan cadangan." },
+  fallsBack: { en: "Falls back:", id: "Jatuh ke cadangan:" },
+  provider: { en: "Provider", id: "Penyedia" },
+  enabled: { en: "enabled", id: "aktif" },
+  apiKey: { en: "API Key", id: "API Key" },
+  enterNewKey: { en: "Enter new key to change", id: "Masukkan kunci baru untuk mengubah" },
+  model: { en: "Model", id: "Model" },
+  modelOverride: { en: "Model override (optional)", id: "Model khusus (opsional)" },
+  baseUrl: { en: "Base URL", id: "Base URL" },
+  loadModels: { en: "Load available models", id: "Muat model tersedia" },
+  loadingDots: { en: "Loading...", id: "Memuat..." },
+  save: { en: "Save", id: "Simpan" },
+  edit: { en: "Edit", id: "Ubah" },
+  savingDots: { en: "Saving...", id: "Menyimpan..." },
+}
+
+const LangCtx = createContext<{ lang: Lang; set: (l: Lang) => void; t: (k: string, vars?: Record<string, string>) => string }>({
+  lang: "en",
+  set: () => {},
+  t: (k) => k,
+})
+
+export function LangProvider({ children }: { children: ReactNode }) {
+  const [lang, setLang] = useState<Lang>("en")
+  useEffect(() => {
+    try { const v = localStorage.getItem("microstudio-lang"); if (v === "en" || v === "id") setLang(v) } catch { /* ignore */ }
+  }, [])
+  const set = (l: Lang) => { setLang(l); try { localStorage.setItem("microstudio-lang", l) } catch { /* ignore */ } }
+  const t = (k: string, vars?: Record<string, string>) => {
+    let s = (D[k] as { en: string; id: string } | undefined)?.[lang] ?? k
+    if (vars) for (const [key, val] of Object.entries(vars)) s = s.replace(`{${key}}`, val)
+    return s
+  }
+  return (
+    <LangCtx.Provider value={{ lang, set, t }}>{children}</LangCtx.Provider>
+  )
+}
+
+export function useLang() {
+  return useContext(LangCtx)
+}

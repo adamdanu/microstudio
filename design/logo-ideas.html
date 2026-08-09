@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MicroStudio — Logo Concepts</title>
+<style>
+  :root{ --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3a; --text:#e8eaf0; --muted:#9aa3b2; --accent:#22d3ee; --red:#ff3b30; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:36px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin-top:8px;margin-bottom:28px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px 16px 16px;cursor:pointer;transition:.15s;position:relative}
+  .card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 34px rgba(0,0,0,.45)}
+  .mark{width:120px;height:120px;margin:2px auto 16px;display:flex;align-items:center;justify-content:center}
+  .mark svg{width:104px;height:104px;display:block}
+  .num{position:absolute;top:12px;left:14px;font-size:11px;font-weight:700;color:var(--muted);background:var(--panel2);border:1px solid var(--border);padding:3px 9px;border-radius:999px}
+  .name{font-size:14px;font-weight:700;text-align:center}
+  .desc{font-size:11.5px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.45;min-height:32px}
+  .bar{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+  .badge{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid}
+  .b1{background:rgba(255,77,48,.12);border-color:rgba(255,77,48,.4);color:#ff7b6b}
+  .b2{background:rgba(255,159,10,.12);border-color:rgba(255,159,10,.4);color:#ffc25c}
+  .b3{background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.4);color:#6ee3f5}
+  .b4{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);color:#7ae8c5}
+  .b5{background:rgba(199,125,255,.12);border-color:rgba(199,125,255,.4);color:#d9a6ff}
+  .b6{background:rgba(255,122,184,.12);border-color:rgba(255,122,184,.4);color:#ff9acb}
+  footer{margin-top:30px;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+  <h1>MicroStudio — Logo Concepts</h1>
+  <p class="sub">Pick one or mix ideas — just reply with the number(s). Hover to preview hover-focus.</p>
+
+  <div class="grid">
+
+    <!-- 01 M signature -->
+    <div class="card"><span class="num">01</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M14 50 V15 L26.5 33 L37 15 V50" stroke="#ff3b30" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">M — Signature</div><div class="desc">The current brand M, redrawn with calm terminals.</div>
+      <div class="bar"><span class="badge b1">signature</span></div>
+    </div>
+
+    <!-- 02 Studio tile -->
+    <div class="card"><span class="num">02</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><rect x="5" y="5" width="54" height="54" rx="15" fill="#0f1115" stroke="#2a2f3a" stroke-width="2"/><path d="M18 46 V20 L30 32 L42 20 V46" stroke="#ff3b30" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">M — Studio tile</div><div class="desc">App-icon badge, works at 32px, ready for the phone/​TV box.</div>
+      <div class="bar"><span class="badge b1">app icon</span></div>
+    </div>
+
+    <!-- 03 M Sunrise -->
+    <div class="card"><span class="num">03</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><circle cx="13" cy="13" r="6.5" fill="#ff9f0a"/><path d="M6 44 C14 24 20 52 26 40 C32 26 39 52 45 40 L52 32" stroke="#ff9f0a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 52 H58" stroke="#2a2f3a" stroke-width="2"/></svg></div>
+      <div class="name">M — Sunrise Trip</div><div class="desc">Image/catalog feel — horizon + sun over the M.</div>
+      <div class="bar"><span class="badge b2">storyteller</span></div>
+    </div>
+
+    <!-- 04 M Lens -->
+    <div class="card"><span class="num">04</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="26" stroke="#22d3ee" stroke-width="3"/><circle cx="32" cy="32" r="17" stroke="#22d3ee" stroke-width="1.5" opacity=".5"/><path d="M20 46 V42 L27 45 L32 46 L37 45 L44 42 V46" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="17" r="2.6" fill="#ff3b30"/></svg></div>
+      <div class="name">M — Lensflare</div><div class="desc">Camera lens inside " Micro" drop-flare — the photo studio.</div>
+      <div class="bar"><span class="badge b3">photographer</span></div>
+    </div>
+
+    <!-- 05 M Tag -->
+    <div class="card"><span class="num">05</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M10 14 H54" stroke="#c77dff" stroke-width="4" stroke-linecap="round"/><path d="M14 20 L38 44" stroke="#c77dff" stroke-width="4" stroke-linecap="round"/><path d="M14 34 L38 10" stroke="#c77dff" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <div class="name">M — Double Tag</div><div class="desc">The stock "tag" diagonal. Abstract, minimal mark.</div>
+      <div class="bar"><span class="badge b5">tags</span></div>
+    </div>
+
+    <!-- 06 M Cube -->
+    <div class="card"><span class="num">06</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M32 6 L54 18 V42 L32 54 L10 42 V18 Z" stroke="#22d3ee" stroke-width="3" stroke-linejoin="round"/><path d="M12 20 L32 34 L52 20" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 15 V25" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/><path d="M42 15 V25" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/></svg></div>
+      <div class="name">M — Prism Cube</div><div class="desc">Hexagon = studio/prism, the roof line forms M.</div>
+      <div class="bar"><span class="badge b3">prism</span></div>
+    </div>
+
+    <!-- 07 M Pixels -->
+    <div class="card"><span class="num">07</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="#34d399"><rect x="8" y="8" width="10" height="10" rx="2"/><rect x="26" y="8" width="10" height="10" rx="2" fill="#ff3b30"/><rect x="44" y="8" width="10" height="10" rx="2" opacity=".55"/><rect x="8" y="26" width="10" height="10" rx="2" opacity=".55"/><rect x="26" y="26" width="10" height="10" rx="2"/><rect x="44" y="26" width="10" height="10" rx="2" opacity=".55"/><rect x="8" y="44" width="10" height="10" rx="2" opacity=".55"/><rect x="26" y="44" width="10" height="10" rx="2"/><rect x="44" y="44" width="10" height="10" rx="2"/></svg></div>
+      <div class="name">M — Pixel Grid</div><div class="desc">The photo mosaic — M shaped from stock tiles.</div>
+      <div class="bar"><span class="badge b4">pixels</span></div>
+    </div>
+
+    <!-- 08 M Frame -->
+    <div class="card"><span class="num">08</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><rect x="9" y="9" width="46" height="46" rx="4" stroke="#2a2f3a" stroke-width="2.5"/><path d="M18 48 V20 L32 38 L46 20 V48" stroke="#ff3b30" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 14 H20 M44 14 H50 M50 50 H50 M14 50 H20" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/></svg></div>
+      <div class="name">M — Photo Frame</div><div class="desc">A picture frame holding the M — the catalog look.</div>
+      <div class="bar"><span class="badge b3">catalog</span></div>
+    </div>
+
+    <!-- 09 Aperture -->
+    <div class="card"><span class="num">09</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="25" stroke="#ff9f0a" stroke-width="3.4"/><path d="M12 40 L32 20 M40 32 L20 44 M52 24 L40 48" stroke="#ff9f0a" stroke-width="3.4" stroke-linecap="round" opacity=".85"/><circle cx="32" cy="32" r="7" fill="#ff3b30"/></svg></div>
+      <div class="name">M — Aperture Eye</div><div class="desc">Camera diaphragm in motion — the "in focus" studio.</div>
+      <div class="bar"><span class="badge b2">aperture</span></div>
+    </div>
+
+    <!-- 10 Orbit -->
+    <div class="card"><span class="num">10</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><ellipse cx="32" cy="32" rx="26" ry="10" stroke="#22d3ee" stroke-width="2.5"/><ellipse cx="32" cy="32" rx="10" ry="26" stroke="#34d399" stroke-width="2.5"/><circle cx="32" cy="32" r="12" fill="#ff3b30" opacity=".9"/><circle cx="32" cy="32" r="5" fill="#0f1115"/><circle cx="57" cy="32" r="3" fill="#22d3ee"/></svg></div>
+      <div class="name">M — Orbit Spark</div><div class="desc">AI + studio merged: orbital AI around the core M.</div>
+      <div class="bar"><span class="badge b3">ai</span></div>
+    </div>
+
+    <!-- 11 Magnifier -->
+    <div class="card"><span class="num">11</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><circle cx="25" cy="26" r="16" stroke="#c77dff" stroke-width="3.4"/><path d="M13 40 L8 52 L22 45" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="25" cy="26" r="2.6" fill="#c77dff"/></svg></div>
+      <div class="name">M — Magnifier</div><div class="desc">Close the shot, the lookup, the tag in the glass.</div>
+      <div class="bar"><span class="badge b5">inspect</span></div>
+    </div>
+
+    <!-- 12 Layers -->
+    <div class="card"><span class="num">12</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8 L54 18 L32 28 L10 18 Z" stroke="#22d3ee" stroke-width="3"/><path d="M10 30 L32 40 L54 30" stroke="#c77dff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 34 V54 M22 48 L32 40 L42 48" stroke="#c77dff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">M — Layers</div><div class="desc">Stacked images/studio layers with an M peak.</div>
+      <div class="bar"><span class="badge b5">layers</span></div>
+    </div>
+
+    <!-- 13 Pulse / stats -->
+    <div class="card"><span class="num">13</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M8 44 L20 44 L26 20 L34 48 L42 32 L48 32 L56 32" stroke="#34d399" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="44" r="2.6" fill="#ff3b30"/><circle cx="42" cy="32" r="2.6" fill="#ff9f0a"/></svg></div>
+      <div class="name">Vitals</div><div class="desc">Stock pulse / uptrend — the trade & search heartbeat.</div>
+      <div class="bar"><span class="badge b4">metrics</span></div>
+    </div>
+
+    <!-- 14 Mono Filled tile -->
+    <div class="card"><span class="num">14</span>
+      <div class="mark"><svg viewBox="0 0 64 64"><rect x="6" y="6" width="52" height="52" rx="16" fill="#ff3b30"/><path d="M18 46 V20 L32 34 L46 20 V46" stroke="#0f1115" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">M — Studio Fill</div><div class="desc">Solid red tile: punch on dark-mode app bars and favicons.</div>
+      <div class="bar"><span class="badge b1">bold</span></div>
+    </div>
+
+    <!-- 15 M ascending arrow W-stock -->
+    <div class="card"><span class="num">15</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M10 52 C16 40 22 40 26 32 C30 24 32 20 36 16 C40 20 42 24 46 32 C50 40 52 42 58 44" stroke="#22d3ee" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <div class="name">Stock Rise</div><div class="desc">A quiet rising M — "Micro" of the catalog-topper.</div>
+      <div class="bar"><span class="badge b3">growth</span></div>
+    </div>
+
+    <!-- 16 Window eme -->
+    <div class="card"><span class="num">16</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><rect x="10" y="14" width="44" height="36" rx="3" stroke="#c77dff" stroke-width="3"/><path d="M24 40 L28 24 L32 32 L36 24 L40 40" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="10" y="14" width="44" height="8" rx="3" fill="#2a2f3a"/><circle cx="15" cy="18" r="1.4" fill="#9aa3b2"/><circle cx="21" cy="18" r="1.4" fill="#9aa3b2"/></svg></div>
+      <div class="name">Window M</div><div class="desc">The uploader window — file cabinet, UI-native mark.</div>
+      <div class="bar"><span class="badge b5">upload</span></div>
+    </div>
+
+    <!-- 17 Hex -->
+    <div class="card"><span class="num">17</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8 L52 20 V40 L32 56 L12 40 V20 Z" stroke="#ff9f0a" stroke-width="3.2" stroke-linejoin="round"/><path d="M20 44 V20 L32 36 L44 20 V44" stroke="#0f1115" stroke-width="0" /><path d="M22 44 V22 L32 38 L42 22 V44" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">Hex M</div><div class="desc">Cool-tech, "micro" — the closed little planet.</div>
+      <div class="bar"><span class="badge b2">geo</span></div>
+    </div>
+
+    <!-- 18 Split dart -->
+    <div class="card"><span class="num">18</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><rect x="8" y="30" width="48" height="26" rx="6" stroke="#ff3b30" stroke-width="3.2"/><path d="M14 38 L24 38 L31 44 L38 26 L46 38 H50" stroke="#ff3b30" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 44 C22 44 26 L48 L14 48 V44" stroke="#c77dff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">Split Card</div><div class="desc">The "product card" metaphor — tag slides across.</div>
+      <div class="bar"><span class="badge b1">products</span></div>
+    </div>
+
+    <!-- 19 Star -->
+    <div class="card"><span class="num">19</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><path d="M32 8 L37 27 L55 32 L37 37 L32 56 L27 37 L9 32 L27 27 Z" stroke="#ff9f0a" stroke-width="2.6" stroke-linejoin="round" fill="#0f1115"/><path d="M27 20 V30" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round"/><path d="M32 30 H46" stroke="#ff3b30" stroke-width="3.4" stroke-linecap="round"/></svg></div>
+      <div class="name">M Star</div><div class="desc">Tag/spark star with red-shot photogram feel.</div>
+      <div class="bar"><span class="badge b2">spark</span></div>
+    </div>
+
+    <!-- 20 badge-monogram lettering -->
+    <div class="card"><span class="num">20</span>
+      <div class="mark"><svg viewBox="0 0 64 64" fill="none"><rect x="6" y="6" width="52" height="52" rx="14" fill="#171a21" stroke="#2a2f3a"/><path d="M16 48 V18 L24 29 L32 18 L40 29 L48 18 V48" stroke="#ff3b30" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 14 H44" stroke="#22d3ee" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+      <div class="name">Monogram Dock</div><div class="desc">Letter-style badge, red+cyan — the geometry pair.</div>
+      <div class="bar"><span class="badge b3">monogram</span></div>
+    </div>
+
+  </div>
+
+  <footer>MicroStudio — Microstock Tag Optimizer · concept board — logo #_</footer>
+</body>
+</html>

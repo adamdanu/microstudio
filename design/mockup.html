@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MITAGO — Mockup</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3a;
+    --text:#e8eaf0; --muted:#9aa3b2; --accent:#22d3ee; --accent2:#a78bfa;
+    --danger:#f87171; --ok:#34d399; --chip:#242a36;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+  .logo{font-weight:700;font-size:20px;letter-spacing:.3px}
+  .logo b{color:var(--accent)}
+  .logo span{color:var(--muted);font-weight:500;font-size:13px;margin-left:8px}
+  .top-actions{display:flex;gap:8px;align-items:center}
+  select.brand{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:13px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .card h3{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px}
+  /* Dropzone */
+  .drop{border:2px dashed var(--border);border-radius:12px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);text-align:center;transition:.2s;cursor:pointer}
+  .drop.drag{border-color:var(--accent);background:rgba(34,211,238,.06);color:var(--text)}
+  .drop .ico{font-size:38px;margin-bottom:10px}
+  .drop small{opacity:.7}
+  /* Output */
+  .field{margin-bottom:16px}
+  .field label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:7px}
+  .field label b{font-family:ui-monospace,Monaco,monospace;font-size:11px;color:var(--ok)}
+  .field input[type=text],.field textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:10px 12px;font-size:14px;outline:none}
+  .field input:focus,.field textarea:focus{border-color:var(--accent)}
+  .field textarea{min-height:60px;resize:none}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{background:var(--chip);border:1px solid var(--border);padding:6px 11px;border-radius:999px;font-size:12.5px;display:inline-flex;align-items:center;gap:5px}
+  .chip.hot{border-color:var(--accent);color:var(--accent)}
+  .chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 2px}
+  .chip button:hover{color:var(--danger)}
+  .row{display:flex;gap:8px;align-items:center;margin-top:4px}
+  .row .chip{flex:1;justify-content:center}
+  select.pill{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:9px 11px;border-radius:9px;font-size:13px;width:100%}
+  .actions{display:flex;gap:8px;margin-top:14px}
+  button{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:9px;cursor:pointer;font-size:13px;transition:.15s}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#062a30;font-weight:600}
+  button:hover{filter:brightness(1.1)}
+  .btn-icon{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:30px 0}
+  .empty .big{font-size:34px;margin-bottom:12px}
+  .empty .steps{display:flex;gap:10px;margin-top:18px;font-size:12px}
+  .empty .steps div{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 8px}
+  .empty .steps b{display:block;color:var(--accent);font-size:16px;margin-bottom:4px}
+  .pill-tag{display:inline-block;background:var(--panel2);border:1px solid var(--border);border-radius:999px;font-size:11px;color:var(--muted);padding:3px 9px;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:22px">
+    <div class="logo" style="display:flex;flex-direction:column;line-height:1.1;gap:2px"><div><span style="color:var(--text)">MITA</span><b style="color:#ff3b30">GO</b></div><span style="color:var(--muted);font-weight:500;font-size:12px">Microstock Tag Optimizer</span></div>
+    <div class="top-actions">
+      <label style="font-size:12px;color:var(--muted)">Provider</label>
+      <select class="brand" title="Provider">
+        <option>Gemini</option><option>OpenAI</option><option>Anthropic</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: upload -->
+    <section class="card">
+      <h2>1 · Upload your photo</h2>
+      <div class="drop" id="drop">
+        <div class="ico">+</div>
+        <div><strong>Drop an image here</strong></div>
+        <small>or click to browse · PNG, JPG, WEBP</small>
+      </div>
+      <div class="hint">Analysis runs automatically once an image is dropped. Your image never leaves this device (optional providers only receive it for vision).</div>
+    </section>
+
+    <!-- RIGHT: output -->
+    <section class="card">
+      <h2>2 · Optimized metadata</h2>
+      <div class="empty" id="empty">
+        <div class="big">✦</div>
+        <strong>Drop an image to generate metadata</strong>
+        <div class="steps">
+          <div><b>1</b>Analyze image</div>
+          <div><b>2</b>Write title</div>
+          <div><b>3</b>Rank keywords</div>
+          <div><b>4</b>Pick category</div>
+        </div>
+      </div>
+
+      <div id="output" style="display:none">
+        <div class="field">
+          <label>Title <b>58 / 70</b></label>
+          <input type="text" value="Young businesswoman analyzing data on laptop in modern office">
+        </div>
+
+        <div class="field">
+          <label>Keywords (22) — first 10 highlighted <b>most weight</b></label>
+          <div class="chips">
+            <span class="chip hot">businesswoman ✕</span>
+            <span class="chip hot">laptop ✕</span>
+            <span class="chip hot">office ✕</span>
+            <span class="chip hot">analytics ✕</span>
+            <span class="chip hot">young professional ✕</span>
+            <span class="chip hot">data ✕</span>
+            <span class="chip hot">dashboard ✕</span>
+            <span class="chip hot">chart ✕</span>
+            <span class="chip hot">focused ✕</span>
+            <span class="chip hot">desk ✕</span>
+            <span class="chip">working ✕</span>
+            <span class="chip">corporate ✕</span>
+            <span class="chip">technology ✕</span>
+            <span class="chip">business ✕</span>
+            <span class="chip">screen ✕</span>
+            <span class="chip">report ✕</span>
+          </div>
+          <div class="row">
+            <input type="text" placeholder="+ add keyword" style="flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:13px">
+            <button class="btn">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Category</label>
+          <select class="pill">
+            <option>Technology</option>
+            <option>Business</option>
+            <option>People</option>
+            <option>Lifestyle</option>
+            <option>Industry</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="primary">Copy title</button>
+          <button>Copy keywords</button>
+          <button>Copy CSV</button>
+        </div>
+        <div class="hint">Auto-suggested by model · always review before submit. First 10 keywords carry the most search weight on Adobe Stock.</div>
+      </div>
+    </section>
+  </div>
+
+  <div style="margin-top:18px">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Capabilities</div>
+    <span class="pill-tag">✓ 21 official Adobe categories</span><span class="pill-tag">✓ ≤ 70 char title</span><span class="pill-tag">✓ 15–35 keywords</span><span class="pill-tag">✓ Multi-provider</span><span class="pill-tag">✓ CSV-ready export</span>
+  </div>
+</div>
+
+<script>
+  // Interactive mockup: drop → reveals output
+  const drop=document.getElementById('drop'), out=document.getElementById('output'), empty=document.getElementById('empty');
+  drop.addEventListener('click',reveal);
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag');reveal()});
+  function reveal(){ empty.style.display='none'; out.style.display='block'; }
+  document.querySelectorAll('.chip button').forEach(b=>b.addEventListener('click',e=>e.stopPropagation()));
+</script>
+</body>
+</html>

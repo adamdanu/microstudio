@@ -1,5 +1,5 @@
 {
-  "name": "stock-seo-tmp",
+  "name": "microstudio",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,9 +8,18 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.34",
+    "@ai-sdk/google": "^4.0.37",
+    "@ai-sdk/openai": "^4.0.34",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "ai": "^7.0.56",
+    "dotenv": "^17.4.2",
     "next": "16.3.0",
+    "prisma": "^7.9.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20",
