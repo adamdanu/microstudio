@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MicroStudio — Merged Batch + Dual-Platform flow mockup</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3a;
+    --text:#e8eaf0; --muted:#9aa3b2; --accent:#22d3ee; --danger:#f87171;
+    --ok:#34d399; --chip:#242a36;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0c10;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:28px;display:grid;gap:20px}
+  .wrap{max-width:1200px;margin:0 auto;background:var(--bg);border:1px solid #262b36;border-radius:18px;padding:22px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-mark{width:40px;height:40px;border-radius:10px;background:#171a21;border:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:6px}
+  .logo-mark b{background:#e5e7eb;border-radius:2px}
+  .logo-mark b.r{background:#ff3b30}
+  .logo-mark b.d{background:rgba(229,231,235,.45)}
+  .wordmark{font-size:20px;font-weight:700;letter-spacing:.3px}
+  .wordmark i{font-style:italic;position:relative}
+  .wordmark i em{position:absolute;width:4px;height:4px;background:#ff3b30;border-radius:50%;top:-3px;left:2px}
+  .tagline{font-size:12px;color:var(--muted)}
+  .top-right{display:flex;gap:8px;align-items:center}
+  button{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:9px;font-size:13px;cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#062a30;font-weight:600}
+  .stepper{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .stepper-item{display:flex;align-items:center;gap:8px;background:none;border:none;padding:6px 10px;font-size:13px;color:var(--muted)}
+  .stepper-item.active{background:var(--panel2);color:var(--text);font-weight:600}
+  .stepper-item .step-num{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;background:var(--panel2);border:1px solid var(--border)}
+  .stepper-item.active .step-num{background:var(--accent);border-color:var(--accent);color:#062a30}
+  .stepper-item.done{color:var(--ok)}
+  .stepper-item.done .step-num{color:var(--ok);border-color:var(--ok)}
+  .stepper-line{flex:1;height:1px;background:var(--border)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--border);color:var(--muted);font-weight:500}
+  .pill-good{background:rgba(52,211,153,.12);color:var(--ok);border-color:rgba(52,211,153,.3)}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .results-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .results-head h3{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+  .results-head .link{background:none;border:none;color:var(--accent)}
+  /* language tabs */
+  .langtabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  .langtabs button{border-radius:9px;padding:7px 12px;font-size:13px;display:flex;align-items:center;gap:6px}
+  .langtabs button small{opacity:.6;font-size:10px;font-family:ui-monospace,monospace}
+  .langtabs button.active{background:var(--accent);border-color:var(--accent);color:#062a30;font-weight:600}
+  .langtabs .note{margin-left:auto;font-size:11px;color:var(--muted)}
+  /* dual panels */
+  .dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.dual-grid{grid-template-columns:1fr}}
+  .dual-panel{padding:16px}
+  .dual-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .dual-head .ptitle{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+  .plt{width:22px;height:22px;border-radius:6px;background:var(--chip);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+  .field{margin-bottom:16px}
+  .field label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:7px}
+  .field label b{font-family:ui-monospace,Monaco,monospace;font-size:11px;color:var(--ok)}
+  .field input[type=text],.field textarea,.field select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:10px 12px;font-size:14px;outline:none}
+  .field textarea{min-height:64px;resize:none;font-family:inherit}
+  .field select{appearance:none}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{background:var(--chip);border:1px solid var(--border);padding:4px 9px;border-radius:999px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+  .chip.hot{border-color:rgba(34,211,238,.4)}
+  .chip button{background:none;border:none;color:var(--muted);font-size:11px;padding:0;cursor:pointer}
+  .add-row{display:flex;gap:8px;margin-top:8px}
+  .add-row input{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:8px 10px;font-size:13px;outline:none}
+  .add-row button{background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text);width:34px}
+  .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .failed-note{margin-bottom:14px;padding:10px 12px;border-radius:10px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);font-size:12.5px;color:var(--danger)}
+  .failed-row{font-family:ui-monospace,monospace;font-size:12px;margin-top:4px;color:var(--text)}
+  .failed-row code{color:var(--danger)}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;max-width:430px;width:100%;padding:22px}
+  .modal h2{font-size:16px;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .modal p.sub{font-size:12px;color:var(--muted);font-family:ui-monospace,monospace;margin-bottom:12px}
+  .modal .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .modal .actions button{min-width:100px;justify-content:center}
+  .batchbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding:10px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--border);font-size:13px}
+  .progbar{height:6px;background:rgba(52,211,153,.18);border-radius:999px;overflow:hidden;flex:1;max-width:220px}
+  .progfill{height:100%;background:var(--ok)}
+  .hint{font-size:12px;color:var(--muted);margin-top:14px}
+  .muted{color:var(--muted)}
+  .scene-label{grid-column:1/-1;text-align:center;color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+  .footer-bar{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .footer-bar button{font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- Scene 1: Step 2 results, both panels, one processed image + one failed image -->
+<div class="wrap" id="scene1">
+  <header>
+    <div class="logo">
+      <div class="logo-mark"><b class="r"></b><b></b><b class="d"></b><b></b><b></b><b class="d"></b><b class="d"></b><b></b><b class="d"></b></div>
+      <div><div class="wordmark">MicroSt<i>ud<em></em>io</i></div><div class="tagline">Microstock Tag Optimizer</div></div>
+    </div>
+    <div class="top-right">
+      <button>EN</button>
+      <button>AI Settings</button>
+      <button>Log out</button>
+    </div>
+  </header>
+
+  <div class="stepper">
+    <div class="stepper-item done"><span class="step-num">✓</span><span>Upload Photos</span></div>
+    <div class="stepper-line"></div>
+    <div class="stepper-item active"><span class="step-num">2</span><span>Optimized Metadata <span class="pill pill-good">3 · Adobe + Shutterstock</span></span></div>
+  </div>
+
+  <section class="card">
+    <div class="results-head">
+      <h3>2 · Optimized Metadata <span class="pill">3 uploaded</span></h3>
+      <button class="link">+ Add more photos</button>
+    </div>
+
+    <!-- gallery thumbs -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="width:88px;padding:8px;border-radius:10px;background:var(--panel2);border:1px solid var(--accent)">
+        <div style="height:52px;background:linear-gradient(135deg,#1e78b4,#0e7490);border-radius:7px"></div>
+        <div style="font-size:10px;color:var(--text);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">DSC07595.jpg</div>
+        <div style="font-size:9px;color:var(--muted)">Animals · 42 kw</div>
+      </div>
+      <div style="width:88px;padding:8px;border-radius:10px;background:var(--panel2);border:1px solid var(--border)">
+        <div style="height:52px;background:linear-gradient(135deg,#7c5c1e,#b45309);border-radius:7px"></div>
+        <div style="font-size:10px;color:var(--text);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CIMG4475.jpg</div>
+        <div style="font-size:9px;color:var(--muted)">Travel · 38 kw</div>
+      </div>
+      <div style="width:88px;padding:8px;border-radius:10px;background:var(--panel2);border:1px solid rgba(248,113,113,.35)">
+        <div style="height:52px;background:repeating-linear-gradient(45deg,#2a2f3a,#2a2f3a 6px,#1d212b 6px,#1d212b 12px);border-radius:7px"></div>
+        <div style="font-size:10px;color:var(--danger);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CIMG4519.jpg</div>
+        <div style="font-size:9px;color:var(--muted)">failed</div>
+      </div>
+    </div>
+
+    <!-- per-image error isolation -->
+    <div class="failed-note">
+      <strong>1 image failed to analyze</strong>
+      <div class="failed-row"><code>CIMG4519.jpg</code> — The provider couldn't read this image. Retried 3×. Re-drop it to try again.</div>
+    </div>
+
+    <div class="langtabs">
+      <button class="active">English <small>EN</small></button>
+      <button>Deutsch <small>DE</small></button>
+      <button>العَرَبِيَّة <small>AR</small></button>
+      <span class="note">CSV downloads respect the selected language</span>
+    </div>
+
+    <div class="dual-grid">
+      <div class="card dual-panel">
+        <div class="dual-head"><span class="ptitle"><span class="plt">A</span>Adobe Stock</span><span class="pill pill-good">CSV ready</span></div>
+        <div class="field"><label>Title <b>42 / 70</b></label><input type="text" value="Mountain valley road at golden hour, curling through pines"></div>
+        <div class="field"><label>Description</label><textarea>A curving mountain road at golden hour winding through pine forest in a green valley.</textarea></div>
+        <div class="field"><label>Keywords (42) — first 10 carry most weight</label>
+          <div class="chips">
+            <span class="chip hot">mountain road<button>✕</button></span><span class="chip hot">golden hour<button>✕</button></span><span class="chip hot">pine forest<button>✕</button></span><span class="chip hot">valley<button>✕</button></span><span class="chip hot">winding road<button>✕</button></span><span class="chip hot">travel<button>✕</button></span><span class="chip hot">scenic<button>✕</button></span><span class="chip hot">drone view<button>✕</button></span><span class="chip hot">autumn<button>✕</button></span><span class="chip hot">nature<button>✕</button></span>
+            <span class="chip">landscape<button>✕</button></span><span class="chip">road trip<button>✕</button></span><span class="chip">outdoor<button>✕</button></span><span class="chip">summer<button>✕</button></span><span class="chip">adventure<button>✕</button></span>
+          </div>
+          <div class="add-row"><input placeholder="+ add keyword"><button>+</button></div>
+        </div>
+        <div class="field"><label>Category (required)</label><select><option>Travel</option><option>Landscape</option></select></div>
+        <div class="actions">
+          <button class="primary" data-open="adobe" onclick="openModal('adobe')" id="dl-adobe">⇩ Download Adobe CSV</button>
+          <button>Copy title</button><button>Copy keywords</button>
+        </div>
+      </div>
+
+      <div class="card dual-panel">
+        <div class="dual-head"><span class="ptitle"><span class="plt">S</span>Shutterstock</span><span class="pill pill-good">CSV ready</span></div>
+        <div class="field"><label>Title <b>38 / 70</b></label><input type="text" value="Mountain valley road at golden hour, pine forest"></div>
+        <div class="field"><label>Description</label><textarea>A winding mountain road through a pine forest valley bathed in warm golden-hour light — ideal for travel features.</textarea></div>
+        <div class="field"><label>Keywords (38) — 7–50 required</label>
+          <div class="chips">
+            <span class="chip">mountain road<button>✕</button></span><span class="chip">golden hour<button>✕</button></span><span class="chip">pine forest<button>✕</button></span><span class="chip">valley<button>✕</button></span><span class="chip">scenic drive<button>✕</button></span><span class="chip">travel<button>✕</button></span>
+            <span class="chip">landscape<button>✕</button></span><span class="chip">adventure<button>✕</button></span><span class="chip">road trip<button>✕</button></span><span class="chip">nature<button>✕</button></span>
+          </div>
+          <div class="add-row"><input placeholder="+ add keyword"><button>+</button></div>
+        </div>
+        <div class="field">
+          <label>Categories (1 required, 2nd optional)</label>
+          <select><option>Nature</option></select>
+          <select style="margin-top:8px"><option>No second category</option><option>Travel</option></select>
+        </div>
+        <div class="actions">
+          <button class="primary" data-open="shutterstock" onclick="openModal('shutterstock')" id="dl-shutter">⇩ Download Shutterstock CSV</button>
+          <button>Copy title</button><button>Copy keywords</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">Auto-suggested by the model — edit before submitting. Both CSVs are generated in one analysis pass.</div>
+  </section>
+</div>
+
+<!-- Scene 2: Step 1 — during batch processing (progress bar visible) -->
+<div class="wrap" id="scene2">
+  <header>
+    <div class="logo">
+      <div class="logo-mark"><b class="r"></b><b></b><b class="d"></b><b></b><b></b><b class="d"></b><b class="d"></b><b></b><b class="d"></b></div>
+      <div><div class="wordmark">MicroSt<i>ud<em></em>io</i></div><div class="tagline">Microstock Tag Optimizer</div></div>
+    </div>
+    <div class="top-right"><button>EN</button><button>AI Settings</button><button>Log out</button></div>
+  </header>
+
+  <div class="batchbar">Processing <strong>2/3</strong>…<div class="progbar"><div class="progfill" style="width:66%"></div></div></div>
+
+  <div class="stepper">
+    <div class="stepper-item active"><span class="step-num">1</span><span>Upload Photos</span></div>
+    <div class="stepper-line"></div>
+    <div class="stepper-item"><span class="step-num">2</span><span>Optimized Metadata</span></div>
+  </div>
+
+  <section class="card upload-card">
+    <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:14px">1 · Upload your photo</h3>
+    <div style="border:2px dashed var(--border);border-radius:14px;padding:46px 20px;text-align:center;cursor:pointer;background:var(--panel2)">
+      <div style="font-size:26px;color:var(--muted)">＋</div>
+      <div style="font-weight:600;margin-top:6px">Drop images here</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">or click to browse · PNG, JPG</div>
+    </div>
+    <div class="selected-row" style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <div style="width:84px;padding:7px;border-radius:9px;background:var(--panel2);border:1px solid var(--border)">
+        <div style="height:48px;background:linear-gradient(135deg,#1e78b4,#0e7490);border-radius:6px"></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">DSC07595.jpg</div>
+        <button style="background:none;border:none;color:var(--muted);font-size:10px;padding:0">✕</button>
+      </div>
+      <div style="width:84px;padding:7px;border-radius:9px;background:var(--panel2);border:1px solid var(--border)">
+        <div style="height:48px;background:linear-gradient(135deg,#7c5c1e,#b45309);border-radius:6px"></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CIMG4475.jpg</div>
+        <button style="background:none;border:none;color:var(--muted);font-size:10px;padding:0">✕</button>
+      </div>
+      <div style="width:84px;padding:7px;border-radius:9px;background:var(--panel2);border:1px solid var(--border)">
+        <div style="height:48px;background:linear-gradient(135deg,#4a5568,#374151);border-radius:6px"></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CIMG4519.jpg</div>
+        <button style="background:none;border:none;color:var(--muted);font-size:10px;padding:0">✕</button>
+      </div>
+    </div>
+    <button class="primary" style="margin-top:14px;font-size:14px">✦ Generate Metadata (3)</button>
+    <div class="processing" style="margin-top:16px;display:flex;align-items:center;gap:10px">
+      <div class="progbar" style="max-width:none"><div class="progfill" style="width:66%"></div></div>
+      <span style="font-size:12.5px;color:var(--muted)">Generating optimized metadata… 2/3</span>
+    </div>
+    <div class="hint">Drop image(s), press Generate — analysis runs against your configured AI provider (vision).</div>
+  </section>
+</div>
+
+<!-- Language picker modal (shown when a Download button is clicked) -->
+<div class="modal-bg" id="langModal" style="display:none">
+  <div class="modal">
+    <h2 id="modalTitle">⇩ Download CSV</h2>
+    <p class="sub" id="modalSub">Filename,Title,Keywords,Category,Releases</p>
+    <p style="font-size:13px;margin-bottom:12px">Choose a language for this CSV</p>
+    <div class="actions">
+      <button onclick="pickLang('en')">English</button>
+      <button onclick="pickLang('de')">Deutsch</button>
+      <button onclick="pickLang('ar')">العربية</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene-label">Scene 1 — Step 2: dual panels + error isolation + failed file reason</div>
+<div class="scene-label">Scene 2 — Step 1: batch progress bar (hides when complete)</div>
+<div class="scene-label">Click ⇩ Download CSV on either panel → language picker modal</div>
+
+<script>
+  function openModal(which){
+    const m = document.getElementById('langModal');
+    document.getElementById('modalTitle').textContent = which === 'adobe'
+      ? '\u21E9 Download CSV \u00B7 Adobe' : '\u21E9 Download CSV \u00B7 Shutterstock';
+    document.getElementById('modalSub').textContent = which === 'adobe'
+      ? 'Filename,Title,Keywords,Category,Releases' : 'Filename,Description,Keywords,Categories,Illustration,Mature Content,Editorial';
+    m.style.display = 'flex';
+  }
+  function pickLang(l){
+    alert('Would download: microstudio_' + (document.getElementById('modalTitle').textContent.includes('Adobe') ? 'adobe' : 'shutterstock') + '_' + l + '.csv');
+    document.getElementById('langModal').style.display = 'none';
+  }
+  document.getElementById('langModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.style.display='none'; });
+</script>
+
+</body>
+</html>
