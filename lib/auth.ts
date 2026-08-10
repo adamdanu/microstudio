@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { scryptSync, timingSafeEqual } from "node:crypto"
 import { createSessionToken, verifySessionToken } from "@/lib/session-token"
 
-const SESSION_COOKIE = "mitago_session"
+const SESSION_COOKIE = "microstudio_session"
 const SESSION_MAX_AGE = 7 * 24 * 3600
 
 export function getSecret(): string {

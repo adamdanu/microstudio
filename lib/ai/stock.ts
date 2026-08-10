@@ -289,9 +289,9 @@ const PLATFORM_SHAPES = {
   shutterstock: '{"title":{"en":"","de":"","ar":""},"description":{"en":"","de":"","ar":""},"keywords":{"en":[""],"de":[""],"ar":[""]},"categories":[""]}',
 }
 
-let textModel = process.env.MICROSTUDIO_TEXT_MODEL || 'oc/deepseek-v4-flash-free'
-
-function chatCompletions(baseURL: string, apiKey: string, payload: Record<string, unknown>): Promise<any> {
+function chatCompletions(baseURL: string, apiKey: string, payload: Record<string, unknown>, timeoutMs = 60000): Promise<any> {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
   return fetch(`${baseURL}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -299,12 +299,18 @@ function chatCompletions(baseURL: string, apiKey: string, payload: Record<string
       'Authorization': `Bearer ${apiKey || ''}`,
     },
     body: JSON.stringify(payload),
+    signal: ctrl.signal,
   }).then(async res => {
+    clearTimeout(timer)
     if (!res.ok) {
       const txt = await res.text().catch(() => '')
       throw new Error(`Provider error ${res.status}: ${txt.slice(0, 200)}`)
     }
     return res.json()
+  }).catch(e => {
+    clearTimeout(timer)
+    if ((e as Error)?.name === 'AbortError') throw new Error(`Provider timeout after ${timeoutMs}ms`)
+    throw e
   })
 }
 
@@ -315,68 +321,113 @@ function extractContent(d: any): string {
 }
 
 // Stage 1 — vision model reads the image → short factual description.
+// Tries gemma (currently fastest/healthiest via openrouter) FIRST, then falls back
+// to config.model, then any other proven model — so a slow/dead vision model never
+// burns the whole Cloudflare budget before the metadata generation even starts.
+const VISION_CHAIN = [
+  'openrouter/google/gemma-4-26b-a4b-it:free',
+  process.env.MICROSTUDIO_VISION_MODEL || 'oc/mimo-v2.5-free',
+]
 async function describeImage(imageBase64: string, mimeType: string, config: AIProviderConfig): Promise<string> {
   const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
-  const d = await chatCompletions(baseURL, config.apiKey || '', {
-    model: config.model,
-    stream: false,
-    temperature: 0.2,
-    max_tokens: 600,
-    messages: [
-      { role: 'system', content: VISION_DESC_SYSTEM },
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: 'Describe this image.' },
-          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
+  const chain = Array.from(new Set([...VISION_CHAIN, config.model].filter(Boolean)))
+  let lastErr: unknown = null
+  for (const model of chain) {
+    try {
+      const d = await chatCompletions(baseURL, config.apiKey || '', {
+        model,
+        stream: false,
+        temperature: 0.2,
+        max_tokens: 600,
+        messages: [
+          { role: 'system', content: VISION_DESC_SYSTEM },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'Describe this image.' },
+              { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
+            ],
+          },
         ],
-      },
-    ],
-  })
-  return extractContent(d)
+      }, 45000)
+      const desc = extractContent(d)
+      if (desc && desc.trim().length > 0) return desc
+    } catch (e) {
+      lastErr = e
+      const msg = String((e as Error).message || e)
+      if (!/429|rate.limit|FreeUsageLimit/i.test(msg)) break // hard error -> next model
+      await new Promise(r => setTimeout(r, 1500))
+    }
+  }
+  throw new Error(lastErr instanceof Error ? lastErr.message : 'Vision model returned an empty description')
 }
 
 // Stage 2 — text model turns the description into ONE platform pack.
+// Tries a fallback chain (gemma -> deepseek -> mimo) so a transient 429/timeout/empty
+// on one model does not fail the image. Order = current health (gemma is fast & reliable
+// via openrouter; deepseek+mimo were 504-ing upstream on the box). Each call has a
+// 60s hard abort so a dead model never burns the whole Cloudflare 100s budget.
+const STAGE2_CHAIN = [
+  'openrouter/google/gemma-4-26b-a4b-it:free',  // fast + reliable via openrouter
+  process.env.MICROSTUDIO_TEXT_MODEL || 'oc/deepseek-v4-flash-free',
+  'oc/mimo-v2.5-free',                          // last-resort vision-capable text model
+]
+
 async function platformFromDescription(platform: Platform, description: string, config: AIProviderConfig): Promise<StockMetadata> {
-  if (config.provider === 'deepseek') {
-    // DeepSeek native chat endpoint — same openai-compatible wire shape.
-  }
   const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
-  const d = await chatCompletions(baseURL, config.apiKey || '', {
-    model: textModel,
-    stream: false,
-    temperature: 0.3,
-    max_tokens: 6000,
-    messages: [
-      { role: 'system', content: PLATFORM_FROM_DESC_SYSTEM[platform] },
-      { role: 'user', content: `Image description: ${description}\n\nReturn ONLY valid JSON matching: ${PLATFORM_SHAPES[platform]}` },
-    ],
-  })
-  const content = extractContent(d)
-  let parsed: any
-  try {
-    parsed = JSON.parse(content.replace(/```json|```/g, '').trim())
-  } catch {
-    const balanced = extractSingleJson(content)
-    if (!balanced) throw new Error('Text model did not return JSON. Raw reply: ' + content.slice(0, 160))
-    parsed = balanced
-  }
   const isShutter = platform === 'shutterstock'
   const maxKw = isShutter ? 50 : 45
-  const title = parsed?.title || {}
-  const desc = parsed?.description || parsed?.body || {}
-  const kw = parsed?.keywords || {}
-  const enTitle = title.en || ''
-  const enDesc = desc.en || ''
-  const enKw = Array.isArray(kw.en) ? kw.en : []
-  const out: StockMetadata = {
-    title: { en: title.en || '', de: title.de || enTitle, ar: title.ar || enTitle },
-    description: { en: desc.en || '', de: desc.de || enDesc, ar: desc.ar || enDesc },
-    keywords: kwSlice(pickKeywordsBundle(kw, { en: enKw, de: enKw, ar: enKw }), maxKw),
+  let lastErr: unknown = null
+
+  for (const model of STAGE2_CHAIN) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const d = await chatCompletions(baseURL, config.apiKey || '', {
+          model,
+          stream: false,
+          temperature: 0.3,
+          max_tokens: 6000,
+          messages: [
+            { role: 'system', content: PLATFORM_FROM_DESC_SYSTEM[platform] },
+            { role: 'user', content: `Image description: ${description}\n\nReturn ONLY valid JSON matching: ${PLATFORM_SHAPES[platform]}` },
+          ],
+        })
+        const content = extractContent(d)
+        let parsed: any
+        try {
+          parsed = JSON.parse(content.replace(/```json|```/g, '').trim())
+        } catch {
+          const balanced = extractSingleJson(content)
+          if (!balanced) throw new Error('Text model did not return JSON. Raw reply: ' + content.slice(0, 160))
+          parsed = balanced
+        }
+        const title = parsed?.title || {}
+        const desc = parsed?.description || parsed?.body || {}
+        const kw = parsed?.keywords || {}
+        const enTitle = title.en || ''
+        const enDesc = desc.en || ''
+        const enKw = Array.isArray(kw.en) ? kw.en : []
+        const out: StockMetadata = {
+          title: { en: title.en || '', de: title.de || enTitle, ar: title.ar || enTitle },
+          description: { en: desc.en || '', de: desc.de || enDesc, ar: desc.ar || enDesc },
+          keywords: kwSlice(pickKeywordsBundle(kw, { en: enKw, de: enKw, ar: enKw }), maxKw),
+        }
+        if (isShutter) out.categories = pickCategoryList(parsed.categories || parsed.category, 2)
+        else out.category = closestCategory(parsed.category)
+        return out
+      } catch (e) {
+        lastErr = e
+        const msg = String((e as Error).message || e)
+        const rateLimited = /429|rate.limit|FreeUsageLimit/i.test(msg)
+        const empty = /No content in provider response/i.test(msg)
+        // On 429 wait a short backoff before the retry; on empty move to next model immediately.
+        if (rateLimited) await new Promise(r => setTimeout(r, 2000 * attempt))
+        if (!rateLimited && !empty) break // hard error -> next model
+        if (attempt === 2) break // exhausted retries -> next model
+      }
+    }
   }
-  if (isShutter) out.categories = pickCategoryList(parsed.categories || parsed.category, 2)
-  else out.category = closestCategory(parsed.category)
-  return out
+  throw new Error(lastErr instanceof Error ? lastErr.message : 'All text models failed to generate metadata')
 }
 
 function extractSingleJson(raw: string): any | null {

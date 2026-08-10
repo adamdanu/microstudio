@@ -8,14 +8,14 @@ export function proxy(request: NextRequest) {
   const isApi = pathname.startsWith("/api/")
   const authApi = /^\/api\/auth\/(login|logout)$/.test(pathname)
   if (isApi && !authApi) {
-    const token = request.cookies.get("mitago_session")?.value
+    const token = request.cookies.get("microstudio_session")?.value
     if (!verifyCookieToken(token)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
   }
 
   if (pathname.startsWith("/studio")) {
-    const token = request.cookies.get("mitago_session")?.value
+    const token = request.cookies.get("microstudio_session")?.value
     if (!verifyCookieToken(token)) {
       const url = request.nextUrl.clone()
       url.pathname = "/login"
