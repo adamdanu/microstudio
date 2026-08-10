@@ -321,16 +321,14 @@ function extractContent(d: any): string {
 }
 
 // Stage 1 — vision model reads the image → short factual description.
-// Tries gemma (currently fastest/healthiest via openrouter) FIRST, then falls back
-// to config.model, then any other proven model — so a slow/dead vision model never
-// burns the whole Cloudflare budget before the metadata generation even starts.
-const VISION_CHAIN = [
-  'openrouter/google/gemma-4-26b-a4b-it:free',
-  process.env.MICROSTUDIO_VISION_MODEL || 'oc/mimo-v2.5-free',
-]
+// Uses the user-configured `config.model` as the PRIMARY model. Fallback models are
+// read from env (comma-separated, optional) — never hardcoded, so the operator can
+// customize the openai-compatible chain entirely from configuration.
+const VISION_FALLBACKS = (process.env.MICROSTUDIO_VISION_FALLBACKS || '')
+  .split(',').map(s => s.trim()).filter(Boolean)
 async function describeImage(imageBase64: string, mimeType: string, config: AIProviderConfig): Promise<string> {
   const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
-  const chain = Array.from(new Set([...VISION_CHAIN, config.model].filter(Boolean)))
+  const chain = Array.from(new Set([config.model, ...VISION_FALLBACKS].filter(Boolean)))
   let lastErr: unknown = null
   for (const model of chain) {
     try {
@@ -363,15 +361,15 @@ async function describeImage(imageBase64: string, mimeType: string, config: AIPr
 }
 
 // Stage 2 — text model turns the description into ONE platform pack.
-// Tries a fallback chain (gemma -> deepseek -> mimo) so a transient 429/timeout/empty
-// on one model does not fail the image. Order = current health (gemma is fast & reliable
-// via openrouter; deepseek+mimo were 504-ing upstream on the box). Each call has a
-// 60s hard abort so a dead model never burns the whole Cloudflare 100s budget.
-const STAGE2_CHAIN = [
-  'openrouter/google/gemma-4-26b-a4b-it:free',  // fast + reliable via openrouter
-  process.env.MICROSTUDIO_TEXT_MODEL || 'oc/deepseek-v4-flash-free',
-  'oc/mimo-v2.5-free',                          // last-resort vision-capable text model
-]
+// Uses the user-configured `config.model` as the PRIMARY model. Fallback models are
+// read from env (comma-separated, optional). Each call has a 60s hard abort so a dead
+// model never burns the whole Cloudflare 100s budget.
+const STAGE2_FALLBACKS = (process.env.MICROSTUDIO_TEXT_FALLBACKS || '')
+  .split(',').map(s => s.trim()).filter(Boolean)
+
+function stage2Chain(config: AIProviderConfig): string[] {
+  return Array.from(new Set([config.model, ...STAGE2_FALLBACKS].filter(Boolean)))
+}
 
 async function platformFromDescription(platform: Platform, description: string, config: AIProviderConfig): Promise<StockMetadata> {
   const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
@@ -379,7 +377,7 @@ async function platformFromDescription(platform: Platform, description: string, 
   const maxKw = isShutter ? 50 : 45
   let lastErr: unknown = null
 
-  for (const model of STAGE2_CHAIN) {
+  for (const model of stage2Chain(config)) {
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         const d = await chatCompletions(baseURL, config.apiKey || '', {
