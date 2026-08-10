@@ -10,20 +10,28 @@ import { useLang } from "@/lib/i18n"
 export default function LoginPage() {
   const router = useRouter()
   const { t } = useLang()
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
+  function validateEmail(v: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
+    if (!validateEmail(email)) {
+      setError(t("invalidEmail"))
+      return
+    }
+    setLoading(true)
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       })
       if (res.ok) {
         router.push("/studio")
@@ -32,7 +40,8 @@ export default function LoginPage() {
       }
       const data = await res.json().catch(() => ({}))
       if (res.status === 429) setError(t("tooMany"))
-      else setError(t("invalidCreds"))
+      else if (res.status === 401 && data.error === "Unregistered email") setError(t("unregisteredEmail"))
+      else setError(data.error || t("invalidCreds"))
     } catch {
       setError(t("oops"))
     } finally {
@@ -48,16 +57,20 @@ export default function LoginPage() {
           <Wordmark size={26} />
         </div>
         <p className="login-tagline">{t("adminTag")}</p>
-        <label className="login-label">{t("username")}</label>
+        <label className="login-label">{t("email")}</label>
         <input
           className="login-input"
-          autoComplete="username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          placeholder="admin"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="you@example.com"
           required
         />
-        <label className="login-label">{t("password")}</label>
+        <label className="login-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>{t("password")}</span>
+          <Link className="login-forgot" href="/forgot">{t("forgotPassword")}</Link>
+        </label>
         <input
           className="login-input"
           type="password"
@@ -68,10 +81,12 @@ export default function LoginPage() {
           required
         />
         {error && <p className="login-error">{error}</p>}
-        <button className="login-submit" type="submit" disabled={loading}>
-          {loading ? t("signingIn") : t("signInBtn")}
-        </button>
-        <Link className="login-back" href="/">{t("backLanding")}</Link>
+        <div className="login-actions">
+          <button className="login-submit" type="submit" disabled={loading}>
+            {loading ? t("signingIn") : t("signInBtn")}
+          </button>
+        </div>
+        <Link className="login-back" href="/">{t("backOnly")}</Link>
       </form>
     </main>
   )

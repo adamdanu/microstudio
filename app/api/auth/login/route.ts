@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { verifyCredentials, issueSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth"
+import { verifyCredentials, issueSessionToken, SESSION_COOKIE, SESSION_MAX_AGE, getAdminEmail, ensureAdminUser } from "@/lib/auth"
 
 const MAX_FAILURES = 5
 const LOCKOUT_MS = 60_000
@@ -52,28 +52,39 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: { username?: string; password?: string }
+  let body: { email?: string; password?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 })
   }
 
-  const username = (body.username || "").trim()
+  const email = (body.email || "").trim().toLowerCase()
   const password = body.password || ""
-  if (!username || !password) {
-    return NextResponse.json({ error: "Username and password required" }, { status: 400 })
+  if (!email || !password) {
+    return NextResponse.json({ error: "Email and password required" }, { status: 400 })
   }
 
-  if (!verifyCredentials(username, password)) {
+  // Email format validation + unregistered email blocked
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Enter a valid email address" }, { status: 400 })
+  }
+  if (email !== getAdminEmail()) {
+    return NextResponse.json({ error: "Unregistered email" }, { status: 401 })
+  }
+
+  // Seamless first-run: seed the admin from env if the DB row doesn't exist yet.
+  await ensureAdminUser()
+
+  if (!(await verifyCredentials(email, password))) {
     recordFailure(key)
-    return NextResponse.json({ error: "Invalid username or password" }, { status: 401 })
+    return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
   }
 
   attempts.delete(key)
   const proto = req.headers.get("x-forwarded-proto") || "http"
   const res = NextResponse.json({ ok: true })
-  res.cookies.set(SESSION_COOKIE, issueSessionToken(username), {
+  res.cookies.set(SESSION_COOKIE, issueSessionToken(email), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production" && proto === "https",
     sameSite: "lax",

@@ -9,15 +9,18 @@ type Dict = Record<string, { en: string; id: string }>
 const D: Dict = {
   // common
   signIn: { en: "Sign in", id: "Masuk" },
-  backLanding: { en: "← Back to landing", id: "← Kembali ke beranda" },
-  username: { en: "Username", id: "Nama pengguna" },
+  backOnly: { en: "← Back", id: "← Kembali" },
+  email: { en: "Email", id: "Email" },
   password: { en: "Password", id: "Kata sandi" },
   adminTag: { en: "Microstock Tag Optimizer — admin", id: "Microstock Tag Optimizer — admin" },
-  signInBtn: { en: "Sign in →", id: "Masuk →" },
+  signInBtn: { en: "Sign in", id: "Masuk" },
   signingIn: { en: "Signing in…", id: "Masuk…" },
-  invalidCreds: { en: "Invalid username or password", id: "Nama pengguna atau kata sandi salah" },
+  invalidCreds: { en: "Invalid email or password", id: "Email atau kata sandi salah" },
+  invalidEmail: { en: "Enter a valid email address", id: "Masukkan alamat email yang valid" },
+  unregisteredEmail: { en: "This email is not registered", id: "Email ini tidak terdaftar" },
   tooMany: { en: "Too many attempts. Try again later.", id: "Terlalu banyak percobaan. Coba lagi nanti." },
   oops: { en: "Something went wrong", id: "Terjadi kesalahan" },
+  forgotPassword: { en: "Forgot password?", id: "Lupa kata sandi?" },
 
   // landing
   hero1: { en: "Stop guessing tags.", id: "Berhenti menebak tag." },

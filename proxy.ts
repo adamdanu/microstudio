@@ -6,7 +6,7 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const isApi = pathname.startsWith("/api/")
-  const authApi = /^\/api\/auth\/(login|logout)$/.test(pathname)
+  const authApi = /^\/api\/auth\/(login|logout|forgot|reset|profile)$/.test(pathname)
   if (isApi && !authApi) {
     const token = request.cookies.get("microstudio_session")?.value
     if (!verifyCookieToken(token)) {
@@ -14,7 +14,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  if (pathname.startsWith("/studio")) {
+  if (pathname.startsWith("/studio") || pathname.startsWith("/profile")) {
     const token = request.cookies.get("microstudio_session")?.value
     if (!verifyCookieToken(token)) {
       const url = request.nextUrl.clone()
@@ -28,5 +28,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/studio/:path*", "/api/:path*"],
+  matcher: ["/studio/:path*", "/profile/:path*", "/api/:path*"],
 }
