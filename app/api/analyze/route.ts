@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server'
 import { getStoredConfig, getEnabledProviders } from '@/lib/ai/stored-config'
 import { generateMetadataDual } from '@/lib/ai/stock'
+import { getSessionUser, updateLastActive } from '@/lib/auth'
 import type { AIProvider } from '@/lib/ai/adapter'
 
 export async function POST(req: Request) {
   try {
+    const user = await getSessionUser()
+    if (!user || user.blocked) {
+      return NextResponse.json({ error: 'Access expired or account disabled' }, { status: 403 })
+    }
+    updateLastActive(user.email)
+
     const body = await req.json()
     const { image, mimeType, provider } = body as { image: string; mimeType: string; provider?: AIProvider }
 

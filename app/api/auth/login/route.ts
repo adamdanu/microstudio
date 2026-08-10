@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { verifyCredentials, issueSessionToken, SESSION_COOKIE, SESSION_MAX_AGE, getAdminEmail, ensureAdminUser } from "@/lib/auth"
+import { verifyCredentials, issueSessionToken, SESSION_COOKIE, SESSION_MAX_AGE, ensureAdminUser } from "@/lib/auth"
 
 const MAX_FAILURES = 5
 const LOCKOUT_MS = 60_000
@@ -65,20 +65,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 })
   }
 
-  // Email format validation + unregistered email blocked
+  // Email format validation + unregistered email blocked (handled in verifyCredentials)
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Enter a valid email address" }, { status: 400 })
   }
-  if (email !== getAdminEmail()) {
-    return NextResponse.json({ error: "Unregistered email" }, { status: 401 })
-  }
 
-  // Seamless first-run: seed the admin from env if the DB row doesn't exist yet.
+  // Seamless first-run: ensure the admin row exists (seeded from env on first access).
   await ensureAdminUser()
 
-  if (!(await verifyCredentials(email, password))) {
+  const session = await verifyCredentials(email, password)
+  if (!session) {
     recordFailure(key)
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
+  }
+  if (session.blocked) {
+    recordFailure(key)
+    return NextResponse.json({ error: "Access expired or account disabled" }, { status: 403 })
   }
 
   attempts.delete(key)

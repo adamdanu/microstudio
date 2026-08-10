@@ -18,11 +18,35 @@ model AiProviderConfig {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
+  id                String     @id @default(cuid())
+  email             String     @unique
   passwordHash      String
+  role              Role       @default(USER)
+  status            Status     @default(ACTIVE)
+  accessType        AccessType @default(DAYS_30)
+  expiresAt         DateTime?
+  lastActiveAt      DateTime?
   resetTokenHash    String?
   resetTokenExpires DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdById       String?
+  createdBy         User?      @relation("UserCreations", fields: [createdById], references: [id])
+  createdByMe       User[]     @relation("UserCreations")
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Status {
+  ACTIVE
+  DISABLED
+}
+
+enum AccessType {
+  DAYS_30
+  UNLIMITED
+  CUSTOM
 }

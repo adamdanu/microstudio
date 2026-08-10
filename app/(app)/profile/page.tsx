@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Logo } from "../components/Logo"
-import { Wordmark } from "../components/Wordmark"
-import { LangToggle } from "../components/LangToggle"
+import { Logo } from "../../components/Logo"
+import { Wordmark } from "../../components/Wordmark"
+import { LangToggle } from "../../components/LangToggle"
 import { useLang } from "@/lib/i18n"
 
 export default function ProfilePage() {
@@ -54,23 +54,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="wrap">
-      <header>
-        <div className="logo">
-          <Logo size={40} />
-          <div>
-            <div><Wordmark size={22} /></div>
-            <span className="tagline">Microstock Tag Optimizer</span>
-          </div>
-        </div>
-        <div className="top-right">
-          <LangToggle />
-          <button onClick={() => (window.location.href = "/studio")}>{t("openStudio")}</button>
-          <button onClick={logout} title={t("logOut")} style={{ borderColor: "var(--border)" }}>{t("logOut")}</button>
-        </div>
-      </header>
-
-      <section className="card" style={{ maxWidth: 520, margin: "0 auto" }}>
+    <section className="card" style={{ maxWidth: 520, margin: "0 auto" }}>
         <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", marginBottom: 14 }}>Profile</h3>
 
         <div className="field">
@@ -102,6 +86,5 @@ export default function ProfilePage() {
           </div>
         </form>
       </section>
-    </div>
   )
 }

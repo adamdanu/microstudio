@@ -1,0 +1,17 @@
+export type ProviderName = "openai" | "anthropic" | "google" | "deepseek" | "openai-compatible"
+
+export const PROVIDER_LABELS: Record<ProviderName, string> = {
+  openai: "OpenAI",
+  anthropic: "Anthropic",
+  google: "Google Gemini",
+  deepseek: "DeepSeek",
+  "openai-compatible": "OpenAI Compatible",
+}
+
+export const PROVIDER_META = [
+  { id: "openai", label: "OpenAI", defaultModel: "gpt-4o", envVar: "OPENAI_API_KEY" },
+  { id: "anthropic", label: "Anthropic", defaultModel: "claude-sonnet-4-20250514", envVar: "ANTHROPIC_API_KEY" },
+  { id: "google", label: "Google Gemini", defaultModel: "gemini-3.5-flash-lite", envVar: "GOOGLE_GENERATIVE_AI_API_KEY" },
+  { id: "deepseek", label: "DeepSeek", defaultModel: "deepseek-v4-flash", envVar: "DEEPSEEK_API_KEY" },
+  { id: "openai-compatible", label: "OpenAI Compatible", defaultModel: "gpt-4o-mini", envVar: "OPENAI_API_KEY" },
+] as const

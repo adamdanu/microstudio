@@ -22,6 +22,13 @@ const D: Dict = {
   oops: { en: "Something went wrong", id: "Terjadi kesalahan" },
   forgotPassword: { en: "Forgot password?", id: "Lupa kata sandi?" },
   profile: { en: "Profile", id: "Profil" },
+  studio: { en: "Studio", id: "Studio" },
+  adminSec: { en: "Admin", id: "Admin" },
+  adminDashboard: { en: "Admin Dashboard", id: "Dashboard Admin" },
+  adminUtilities: { en: "Admin Utilities", id: "Utilitas Admin" },
+  searchEmail: { en: "Search by email…", id: "Cari berdasarkan email…" },
+  changePw: { en: "Password", id: "Kata sandi" },
+  noResults: { en: "No users found", id: "Tidak ada pengguna" },
 
   // landing
   hero1: { en: "Stop guessing tags.", id: "Berhenti menebak tag." },

@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { scryptSync, randomBytes, createHmac, timingSafeEqual } from "node:crypto"
 import { createSessionToken, verifySessionToken } from "@/lib/session-token"
 import { prisma } from "@/lib/prisma"
+import type { Role, Status, AccessType } from "@prisma/client"
 
 const SESSION_COOKIE = "microstudio_session"
 const SESSION_MAX_AGE = 7 * 24 * 3600
@@ -22,7 +23,7 @@ export function hashPassword(password: string): string {
   return `${salt}:${hex}`
 }
 
-function verifyHash(hash: string, password: string): boolean {
+export function verifyHash(hash: string, password: string): boolean {
   const [salt, hex] = hash.split(":")
   if (!salt || !hex) return false
   const given = scryptSync(password, salt, 64)
@@ -31,8 +32,7 @@ function verifyHash(hash: string, password: string): boolean {
 }
 
 // ── seeding ────────────────────────────────────────────────────────────────
-// On first auth access, ensure the admin user exists in the DB, seeded from the
-// env-provided email + password hash (keeps the current admin working).
+// On first access, ensure the admin user exists (role ADMIN, unlimited access).
 export async function ensureAdminUser(): Promise<{ email: string; exists: boolean }> {
   const email = getAdminEmail()
   const envHash = process.env.ADMIN_PASSWORD_HASH || ""
@@ -41,19 +41,55 @@ export async function ensureAdminUser(): Promise<{ email: string; exists: boolea
   if (!envHash) return { email, exists: false }
   await prisma.user.upsert({
     where: { email },
-    create: { email, passwordHash: envHash },
+    create: { email, passwordHash: envHash, role: "ADMIN", accessType: "UNLIMITED", status: "ACTIVE" },
     update: {},
   })
   return { email, exists: false }
 }
 
+export type SessionUser = {
+  email: string
+  role: Role
+  status: Status
+  accessType: AccessType
+  expiresAt: Date | null
+  isAdmin: boolean
+  blocked: boolean
+}
+
+// ── access gate ────────────────────────────────────────────────────────────
+// Blocked iff status=DISABLED OR (accessType ≠ UNLIMITED AND expired).
+export function isUserBlocked(u: { status: Status; accessType: AccessType; expiresAt: Date | null }): boolean {
+  if (u.status === "DISABLED") return true
+  if (u.accessType === "UNLIMITED") return false
+  if (u.expiresAt && u.expiresAt.getTime() <= Date.now()) return true
+  return false
+}
+
 // ── credential verification against the DB ────────────────────────────────
-export async function verifyCredentials(email: string, password: string): Promise<boolean> {
+export async function verifyCredentials(email: string, password: string): Promise<SessionUser | null> {
   const norm = email.trim().toLowerCase()
-  if (norm !== getAdminEmail()) return false // unregistered email blocked
+  if (norm !== getAdminEmail() && !(await userExists(norm))) return null // only registered emails
   const user = await prisma.user.findUnique({ where: { email: norm } })
-  if (!user) return false
-  return verifyHash(user.passwordHash, password)
+  if (!user) return null
+  if (!verifyHash(user.passwordHash, password)) return null
+  return sessionUserOf(user)
+}
+
+async function userExists(email: string): Promise<boolean> {
+  return (await prisma.user.findUnique({ where: { email } })) !== null
+}
+
+function sessionUserOf(u: { email: string; role: Role; status: Status; accessType: AccessType; expiresAt: Date | null }): SessionUser {
+  return {
+    email: u.email,
+    role: u.role,
+    status: u.status,
+    accessType: u.accessType,
+    expiresAt: u.expiresAt,
+    isAdmin: u.role === "ADMIN",
+    blocked: isUserBlocked(u),
+  }
 }
 
 export function issueSessionToken(user: string): string {
@@ -65,22 +101,20 @@ export function verifyCookieToken(token: string | undefined): { user: string } |
 }
 
 export async function verifyRequest(): Promise<boolean> {
-  try {
-    const store = await cookies()
-    const token = store.get(SESSION_COOKIE)?.value
-    return !!verifyCookieToken(token)
-  } catch {
-    return false
-  }
+  const user = await getSessionUser()
+  return !!user
 }
 
-export async function getSessionUser(): Promise<{ email: string } | null> {
+// Re-queries DB each request so role/status/expiry changes apply immediately.
+export async function getSessionUser(): Promise<SessionUser | null> {
   try {
     const store = await cookies()
     const token = store.get(SESSION_COOKIE)?.value
     const payload = verifyCookieToken(token)
-    if (!payload) return null
-    return { email: payload.user }
+    if (!payload?.user) return null
+    const user = await prisma.user.findUnique({ where: { email: payload.user.toLowerCase() } })
+    if (!user) return null
+    return sessionUserOf(user)
   } catch {
     return null
   }
@@ -101,6 +135,14 @@ export async function updatePassword(email: string, newPassword: string): Promis
   } catch {
     return false
   }
+}
+
+export function updateLastActive(email: string): void {
+  // best-effort, fire in background
+  prisma.user.updateMany({
+    where: { email: email.toLowerCase() },
+    data: { lastActiveAt: new Date() },
+  }).catch(() => {})
 }
 
 // ── reset token (HMAC, URL-safe, expires) ──────────────────────────────────
@@ -128,4 +170,4 @@ export function verifyResetToken(token: string): string | null {
   }
 }
 
-export { SESSION_COOKIE, SESSION_MAX_AGE, verifyHash }
+export { SESSION_COOKIE, SESSION_MAX_AGE }

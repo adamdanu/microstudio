@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "MicroStock Tag Optimizer — SEO titles, keywords & categories for Adobe Stock",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
