@@ -26,6 +26,7 @@ const D: Dict = {
   adminSec: { en: "Admin", id: "Admin" },
   adminDashboard: { en: "Admin Dashboard", id: "Dashboard Admin" },
   adminUtilities: { en: "Admin Utilities", id: "Utilitas Admin" },
+  activityLog: { en: "Activity Log", id: "Log Aktivitas" },
   searchEmail: { en: "Search by email…", id: "Cari berdasarkan email…" },
   changePw: { en: "Password", id: "Kata sandi" },
   noResults: { en: "No users found", id: "Tidak ada pengguna" },

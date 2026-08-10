@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionUser, getAdminEmail, hashPassword } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { recordActivity } from "@/lib/activity"
 
 const DAY_MS = 86400000
 
@@ -17,7 +18,7 @@ function computeExpiresAt(accessType: string, customDate?: string): Date | null 
 function remainingDays(expiresAt: Date | null, accessType: string): number | null {
   if (accessType === "UNLIMITED") return null
   if (!expiresAt) return null
-  return Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / DAY_MS))
+  return Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / DAY_MS))
 }
 
 async function requireAdmin() {
@@ -125,5 +126,6 @@ export async function POST(req: NextRequest) {
     select: { id: true, email: true, role: true, status: true, accessType: true, expiresAt: true },
   })
 
+  await recordActivity(admin.id, "admin_user_create", `Created user ${email}`)
   return NextResponse.json({ user }, { status: 201 })
 }

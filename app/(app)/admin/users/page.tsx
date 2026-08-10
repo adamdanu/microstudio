@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/i18n"
 import { useAuth } from "../../../components/AuthProvider"
+import { Pagination } from "../../../components/Pagination"
 
 type Row = {
   id: string
@@ -25,6 +26,8 @@ export default function AdminUsers() {
   const [search, setSearch] = useState("")
   const [rows, setRows] = useState<Row[]>([])
   const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
@@ -50,24 +53,25 @@ export default function AdminUsers() {
   // delete confirmation modal per user
   const [delTarget, setDelTarget] = useState<Row | null>(null)
 
-  const load = useCallback(async (q?: string) => {
+  const load = useCallback(async (p?: number, q?: string) => {
     setLoading(true); setErr(null)
     try {
-      const url = `/api/admin/users?pageSize=200${q ? `&search=${encodeURIComponent(q)}` : ""}`
+      const url = `/api/admin/users?page=${p ?? 1}&pageSize=${pageSize}${q ? `&search=${encodeURIComponent(q)}` : ""}`
       const res = await fetch(url)
       const data = await res.json()
       if (!res.ok) { setErr(data.error || "Failed to load"); return }
       setRows(data.items || [])
       setTotal(data.total || 0)
+      setPage(data.page || 1)
     } catch { setErr("Failed to load users") }
     finally { setLoading(false) }
-  }, [])
+  }, [pageSize])
 
   useEffect(() => {
     if (session && !session.isAdmin) router.replace("/studio")
   }, [session, router])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load(1, search) }, [load])
 
   async function createUser(e: React.FormEvent) {
     e.preventDefault()
@@ -84,7 +88,7 @@ export default function AdminUsers() {
       if (res.ok) {
         setMsg(`Created ${data.user.email} (${data.user.accessType}).`)
         setCreateEmail(""); setCreatePass(""); setCreateAccess("DAYS_30"); setCreateExpires("")
-        await load(search)
+        await load(1, search)
       } else setErr(data.error || "Create failed")
     } catch { setErr("Create failed") }
     finally { setCreating(false) }
@@ -95,11 +99,20 @@ export default function AdminUsers() {
     setEditRole(u.role)
     setEditStatus(u.status)
     setEditAccess(u.accessType)
-    setEditExpires(u.expiresAt ? u.expiresAt.slice(0, 10) : "")
+    // Only prefill the date when the user is already CUSTOM and the date is still in
+    // the future. Otherwise leave it blank so the admin consciously picks the real
+    // date instead of accidentally keeping the old (often ~30-day-out) expiry.
+    setEditExpires(u.accessType === "CUSTOM" && u.expiresAt && new Date(u.expiresAt).getTime() > Date.now()
+      ? u.expiresAt.slice(0, 10)
+      : "")
   }
 
   async function saveEdit() {
     if (!editTarget) return
+    if (editAccess === "CUSTOM" && !editExpires) {
+      setErr("Custom access requires picking an expiry date")
+      return
+    }
     const patch: Record<string, unknown> = { role: editRole, status: editStatus, accessType: editAccess }
     if (editAccess === "CUSTOM") patch.expiresAt = new Date(editExpires).toISOString()
     const res = await fetch(`/api/admin/users/${editTarget.id}`, {
@@ -111,7 +124,7 @@ export default function AdminUsers() {
     if (res.ok) {
       setMsg(`Updated ${editTarget.email}`)
       setEditTarget(null)
-      await load(search)
+      await load(1, search)
     } else setErr(data.error || "Update failed")
   }
 
@@ -130,7 +143,7 @@ export default function AdminUsers() {
   async function doDelete() {
     if (!delTarget) return
     const res = await fetch(`/api/admin/users/${delTarget.id}`, { method: "DELETE" })
-    if (res.ok) { setMsg(`Deleted ${delTarget.email}`); setDelTarget(null); await load(search) }
+    if (res.ok) { setMsg(`Deleted ${delTarget.email}`); setDelTarget(null); await load(1, search) }
     else { const d = await res.json().catch(() => ({})); setErr(d.error || "Failed"); setDelTarget(null) }
   }
 
@@ -143,7 +156,7 @@ export default function AdminUsers() {
           placeholder={t("searchEmail")}
           value={search}
           onChange={e => setSearch(e.target.value)}
-          onKeyDown={e => { if (e.key === "Enter") load(search) }}
+          onKeyDown={e => { if (e.key === "Enter") load(1, search) }}
           style={{ padding: "8px 12px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--panel2)", color: "var(--text)", fontSize: 13, width: 260 }}
         />
       </div>
@@ -224,6 +237,7 @@ export default function AdminUsers() {
               </tbody>
             </table>
           </div>
+          <Pagination page={page} total={total} pageSize={pageSize} onChange={p => load(p, search)} />
         </>
       )}
 

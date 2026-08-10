@@ -23,22 +23,36 @@ model AiProviderConfig {
 }
 
 model User {
-  id                String     @id @default(cuid())
-  email             String     @unique
+  id                String            @id @default(cuid())
+  email             String            @unique
   passwordHash      String
-  role              Role       @default(USER)
-  status            Status     @default(ACTIVE)
-  accessType        AccessType @default(DAYS_30)
+  role              Role              @default(USER)
+  status            Status            @default(ACTIVE)
+  accessType        AccessType        @default(DAYS_30)
   expiresAt         DateTime?
   lastActiveAt      DateTime?
   resetTokenHash    String?
   resetTokenExpires DateTime?
-createdById       String?
-  createdBy         User?            @relation("UserCreations", fields: [createdById], references: [id], onDelete: SetNull)
-  createdByMe       User[]           @relation("UserCreations")
+  createdById       String?
+  createdBy         User?             @relation("UserCreations", fields: [createdById], references: [id], onDelete: SetNull)
+  createdByMe       User[]            @relation("UserCreations")
   providerConfigs   AiProviderConfig[]
+  activities        ActivityLog[]
   createdAt         DateTime          @default(now())
-  updatedAt         DateTime   @updatedAt
+  updatedAt         DateTime          @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 enum Role {

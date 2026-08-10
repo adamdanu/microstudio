@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { verifyCredentials, issueSessionToken, SESSION_COOKIE, SESSION_MAX_AGE, ensureAdminUser } from "@/lib/auth"
+import { recordActivity } from "@/lib/activity"
 
 const MAX_FAILURES = 5
 const LOCKOUT_MS = 60_000
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
   }
 
   attempts.delete(key)
+  await recordActivity(session.id, "login", "Signed in", req.headers.get("x-forwarded-for") || undefined)
   const proto = req.headers.get("x-forwarded-proto") || "http"
   const res = NextResponse.json({ ok: true })
   res.cookies.set(SESSION_COOKIE, issueSessionToken(email), {

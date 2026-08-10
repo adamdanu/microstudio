@@ -5,7 +5,7 @@ export function Wordmark({ size = 20 }: { size?: number }) {
         fontSize: `${size}px`,
         fontWeight: 700,
         letterSpacing: "-0.02em",
-        color: "#e5e7eb",
+        color: "var(--text)",
         whiteSpace: "nowrap",
         lineHeight: 1,
       }}

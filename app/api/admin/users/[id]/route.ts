@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionUser, hashPassword } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { recordActivity } from "@/lib/activity"
 
 const DAY_MS = 86400000
 
@@ -53,6 +54,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   }
 
   const user = await prisma.user.update({ where: { id }, data })
+  await recordActivity(admin.id, "admin_user_edit", `Edited ${user.email}`)
   return NextResponse.json({
     user: {
       id: user.id,
@@ -79,6 +81,7 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
   }
 
   await prisma.user.delete({ where: { id } })
+  await recordActivity(admin.id, "admin_user_delete", `Deleted ${target.email}`)
   return NextResponse.json({ ok: true, deleted: true })
 }
 
@@ -106,5 +109,6 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     where: { id },
     data: { passwordHash: hashPassword(password), resetTokenHash: null, resetTokenExpires: null },
   })
+  await recordActivity(admin.id, "admin_user_password", `Changed password for ${target.email}`)
   return NextResponse.json({ ok: true })
 }
