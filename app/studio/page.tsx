@@ -124,7 +124,6 @@ export default function Home() {
           const next = queueRef.current[0]
           const comp = await compressImage(next.dataUrl, next.mime)
           setQueue(q => q.slice(1))
-          setQueueDone(d => d + 1)
           setImage({ dataUrl: comp.dataUrl, mime: comp.mime, fileName: next.fileName })
           let ok = await analyze(comp.dataUrl, comp.mime, next.fileName)
           let attempt = 0
@@ -132,6 +131,7 @@ export default function Home() {
             attempt += 1
             ok = await analyze(comp.dataUrl, comp.mime, next.fileName)
           }
+          setQueueDone(d => d + 1)
         }
       } finally {
         runningRef.current = false
