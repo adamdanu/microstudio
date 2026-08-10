@@ -1,14 +1,21 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Logo } from "../../components/Logo"
-import { Wordmark } from "../../components/Wordmark"
-import { LangToggle } from "../../components/LangToggle"
 import { useLang } from "@/lib/i18n"
+
+type Access = {
+  email: string
+  role: string
+  isAdmin: boolean
+  accessType: string
+  expiresAt: string | null
+  remainingDays: number | null
+  blocked: boolean
+}
 
 export default function ProfilePage() {
   const { t } = useLang()
-  const [email, setEmail] = useState("")
+  const [acc, setAcc] = useState<Access | null>(null)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirm, setConfirm] = useState("")
@@ -17,9 +24,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetch("/api/auth/profile").then(r => r.json()).then(d => {
-      if (d.email) setEmail(d.email)
-    }).catch(() => {})
+    fetch("/api/auth/profile").then(r => r.json()).then(d => setAcc(d)).catch(() => {})
   }, [])
 
   async function changePassword(e: React.FormEvent) {
@@ -48,21 +53,38 @@ export default function ProfilePage() {
     }
   }
 
-  async function logout() {
-    try { await fetch("/api/auth/logout", { method: "POST" }) } catch { /* ignore */ }
-    window.location.href = "/login"
-  }
+  const remainingLabel = acc?.remainingDays === null
+    ? "Unlimited"
+    : `${acc?.remainingDays ?? 0} day${acc?.remainingDays === 1 ? "" : "s"} remaining`
 
   return (
-    <section className="card" style={{ maxWidth: 520, margin: "0 auto" }}>
-        <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", marginBottom: 14 }}>Profile</h3>
+    <section className="card" style={{ maxWidth: 680, margin: "0 auto" }}>
+        <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", marginBottom: 14 }}>{t("profile")}</h3>
 
-        <div className="field">
-          <label>Email</label>
-          <input type="email" value={email} readOnly style={{ opacity: .7 }} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 8 }}>
+          <div className="field">
+            <label>Email</label>
+            <input type="email" value={acc?.email || ""} readOnly style={{ opacity: .7 }} />
+          </div>
+          <div className="field">
+            <label>Access</label>
+            <input
+              value={acc?.remainingDays === null ? "Unlimited" : `${acc?.remainingDays ?? 0} day${acc?.remainingDays === 1 ? "" : "s"} remaining`}
+              readOnly
+              style={{ opacity: .8, color: (acc?.remainingDays ?? 1) <= 5 ? "var(--danger)" : "var(--ok)" }}
+            />
+          </div>
+          <div className="field">
+            <label>Role</label>
+            <input value={acc?.role === "ADMIN" ? "admin" : "user"} readOnly style={{ opacity: .7 }} />
+          </div>
+          <div className="field">
+            <label>Expires</label>
+            <input value={acc?.expiresAt ? new Date(acc.expiresAt).toLocaleDateString() : (acc?.accessType === "UNLIMITED" ? "Never (unlimited)" : "—")} readOnly style={{ opacity: .7 }} />
+          </div>
         </div>
 
-        <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", margin: "20px 0 14px" }}>Change password</h3>
+        <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", margin: "22px 0 14px" }}>Change password</h3>
         <form onSubmit={changePassword}>
           <div className="field">
             <label>Current password</label>

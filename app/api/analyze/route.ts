@@ -20,14 +20,14 @@ export async function POST(req: Request) {
     // Auto-pick the active provider by fallback priority when none specified
     let prov = provider
     if (!prov) {
-      const enabled = await getEnabledProviders()
+      const enabled = await getEnabledProviders(user.id)
       if (enabled.length === 0) {
         return NextResponse.json({ error: 'No AI provider enabled. Add one in AI Settings first.' }, { status: 400 })
       }
       prov = enabled[0].provider
     }
 
-    const config = await getStoredConfig(prov)
+    const config = await getStoredConfig(user.id, prov)
     if (!config) {
       return NextResponse.json({
         error: `Provider "${prov}" is not configured. Add your API key in Settings first.`,

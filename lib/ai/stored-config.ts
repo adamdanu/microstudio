@@ -9,9 +9,11 @@ const DEFAULT_MODELS: Record<AIProvider, string> = {
   'openai-compatible': 'gpt-4o-mini',
 }
 
-export async function getStoredConfig(provider: AIProvider): Promise<AIProviderConfig | null> {
+// Per-user AI provider config. The signed-in user's own API keys are used for
+// analysis — never another user's (e.g. the admin's).
+export async function getStoredConfig(userId: string, provider: AIProvider): Promise<AIProviderConfig | null> {
   try {
-    const stored = await prisma.aiProviderConfig.findUnique({ where: { provider } })
+    const stored = await prisma.aiProviderConfig.findUnique({ where: { userId_provider: { userId, provider } } })
     if (!stored || !stored.enabled) return null
     return {
       provider,
@@ -24,10 +26,10 @@ export async function getStoredConfig(provider: AIProvider): Promise<AIProviderC
   }
 }
 
-export async function getEnabledProviders(): Promise<AIProviderConfig[]> {
+export async function getEnabledProviders(userId: string): Promise<AIProviderConfig[]> {
   try {
     const stored = await prisma.aiProviderConfig.findMany({
-      where: { enabled: true },
+      where: { userId, enabled: true },
       orderBy: { sortOrder: 'asc' },
     })
     return stored.map(s => ({

@@ -48,6 +48,7 @@ export async function ensureAdminUser(): Promise<{ email: string; exists: boolea
 }
 
 export type SessionUser = {
+  id: string
   email: string
   role: Role
   status: Status
@@ -80,8 +81,9 @@ async function userExists(email: string): Promise<boolean> {
   return (await prisma.user.findUnique({ where: { email } })) !== null
 }
 
-function sessionUserOf(u: { email: string; role: Role; status: Status; accessType: AccessType; expiresAt: Date | null }): SessionUser {
+function sessionUserOf(u: { id: string; email: string; role: Role; status: Status; accessType: AccessType; expiresAt: Date | null }) {
   return {
+    id: u.id,
     email: u.email,
     role: u.role,
     status: u.status,
@@ -89,7 +91,7 @@ function sessionUserOf(u: { email: string; role: Role; status: Status; accessTyp
     expiresAt: u.expiresAt,
     isAdmin: u.role === "ADMIN",
     blocked: isUserBlocked(u),
-  }
+  } as SessionUser
 }
 
 export function issueSessionToken(user: string): string {

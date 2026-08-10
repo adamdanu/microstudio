@@ -1,7 +1,14 @@
-:root{
+:root, [data-theme="dark"]{
   --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3a;
   --text:#e8eaf0; --muted:#9aa3b2; --accent:#22d3ee; --danger:#f87171;
   --ok:#34d399; --chip:#242a36;
+  color-scheme: dark;
+}
+[data-theme="light"]{
+  --bg:#f6f5f3; --panel:#ffffff; --panel2:#f1efec; --border:#e3dfd8;
+  --text:#1a1817; --muted:#57534e; --accent:#0a6e81; --danger:#dc2626;
+  --ok:#15803d; --chip:#ece9e4;
+  color-scheme: light;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -183,8 +190,19 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 
 /* ── app shell (sidebar + topbar) ─────────────────────────────── */
 .shell{display:flex;min-height:100vh}
-.sidebar{width:230px;min-width:230px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px;gap:4px}
+.sidebar{width:230px;min-width:230px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px;gap:4px;transition:width .18s ease, min-width .18s ease}
 .sidebar .sb-logo{padding:4px 6px 16px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.sidebar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.sidebar.collapsed{width:64px;min-width:64px}
+.sidebar.collapsed .side-sec{padding:10px 0 4px}
+.sidebar.collapsed .sb-logo{padding:4px 4px 16px}
+.collapse-btn{background:var(--panel2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:auto}
+.collapse-btn:hover{color:var(--text)}
+.nav-ico{display:inline-flex;align-items:center;justify-content:center;flex:none}
+.nav-lbl{white-space:nowrap}
+.nav-item.collapsed{justify-content:center;padding:9px 0}
+.nav-item.collapsed .nav-ico{width:auto}
+.theme-btn{margin-top:4px;text-align:left;width:100%}
 .side-nav{display:flex;flex-direction:column;gap:4px}
 .side-sec{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:12px 8px 6px}
 .nav-item{display:flex;align-items:center;gap:8px;color:var(--muted);border-radius:9px;padding:9px 12px;font-size:13.5px;font-weight:500;text-decoration:none;cursor:pointer;border:none;background:none}
@@ -205,3 +223,8 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 .admin-table td{padding:9px 10px;border-bottom:1px solid rgba(42,47,58,.5);vertical-align:middle}
 .admin-table tr:hover{background:var(--panel2)}
 .admin-table .mono{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)}
+
+/* user chip: email with role below it */
+.user-chip{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-right:6px}
+.user-chip .email-pill{font-size:12px;line-height:1}
+.user-chip .role-pill{font-size:10px;line-height:1;padding:3px 8px}

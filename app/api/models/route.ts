@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getSessionUser } from '@/lib/auth'
 
 const PROVIDER_MODEL_ENDPOINTS: Record<string, string> = {
   openai: 'https://api.openai.com/v1/models',
@@ -25,7 +26,9 @@ export async function POST(req: Request) {
     }
 
     if (apiKey.startsWith('••••')) {
-      const stored = await prisma.aiProviderConfig.findUnique({ where: { provider } })
+      const me = await getSessionUser()
+      if (!me) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      const stored = await prisma.aiProviderConfig.findUnique({ where: { userId_provider: { userId: me.id, provider } } })
       apiKey = stored?.apiKey || apiKey
     }
 
