@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import Link from "next/link"
 import { Logo } from "../components/Logo"
 import { Wordmark } from "../components/Wordmark"
 import { LangToggle } from "../components/LangToggle"
@@ -284,6 +285,7 @@ export default function Home() {
         <div className="top-right">
           <LangToggle />
           <button onClick={() => setShowSettings(true)}>{t("aiSettings")}</button>
+          <Link className="btn" href="/profile">{t("profile")}</Link>
           <button onClick={logout} title={t("logOut")} style={{ borderColor: "var(--border)" }}>{t("logOut")}</button>
         </div>
       </header>

@@ -82,11 +82,11 @@ export default function LoginPage() {
         />
         {error && <p className="login-error">{error}</p>}
         <div className="login-actions">
+          <Link className="login-back-inline" href="/">{t("backOnly")}</Link>
           <button className="login-submit" type="submit" disabled={loading}>
             {loading ? t("signingIn") : t("signInBtn")}
           </button>
         </div>
-        <Link className="login-back" href="/">{t("backOnly")}</Link>
       </form>
     </main>
   )

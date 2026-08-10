@@ -12,7 +12,7 @@ const D: Dict = {
   backOnly: { en: "← Back", id: "← Kembali" },
   email: { en: "Email", id: "Email" },
   password: { en: "Password", id: "Kata sandi" },
-  adminTag: { en: "Microstock Tag Optimizer — admin", id: "Microstock Tag Optimizer — admin" },
+  adminTag: { en: "Microstock Tag Optimizer", id: "Microstock Tag Optimizer" },
   signInBtn: { en: "Sign in", id: "Masuk" },
   signingIn: { en: "Signing in…", id: "Masuk…" },
   invalidCreds: { en: "Invalid email or password", id: "Email atau kata sandi salah" },
@@ -21,6 +21,7 @@ const D: Dict = {
   tooMany: { en: "Too many attempts. Try again later.", id: "Terlalu banyak percobaan. Coba lagi nanti." },
   oops: { en: "Something went wrong", id: "Terjadi kesalahan" },
   forgotPassword: { en: "Forgot password?", id: "Lupa kata sandi?" },
+  profile: { en: "Profile", id: "Profil" },
 
   // landing
   hero1: { en: "Stop guessing tags.", id: "Berhenti menebak tag." },

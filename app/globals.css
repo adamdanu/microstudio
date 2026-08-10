@@ -175,6 +175,8 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 .login-back:hover{color:var(--accent)}
 .login-forgot{color:var(--accent);font-size:12px;text-decoration:none}
 .login-forgot:hover{text-decoration:underline}
-.login-actions{display:flex;justify-content:flex-end;margin-top:4px}
-.login-submit{min-width:120px;text-align:center}
+.login-actions{display:flex;align-items:center;gap:14px;margin-top:4px}
+.login-back-inline{color:var(--muted);font-size:13px;text-decoration:none;white-space:nowrap}
+.login-back-inline:hover{color:var(--accent)}
+.login-submit{min-width:120px;text-align:center;margin-left:auto}
 .login-success{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);color:var(--ok);border-radius:9px;padding:9px 12px;font-size:13px;margin-bottom:16px}
