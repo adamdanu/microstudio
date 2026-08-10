@@ -8,5 +8,8 @@ export async function GET() {
     email: user.email,
     role: user.role,
     isAdmin: user.isAdmin,
+    accessType: user.accessType,
+    remainingDays: user.accessType === "UNLIMITED" ? null : Math.max(0, Math.ceil(((user.expiresAt?.getTime() || 0) - Date.now()) / 86400000)),
+    blocked: user.blocked,
   })
 }

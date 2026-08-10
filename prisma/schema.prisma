@@ -33,9 +33,9 @@ model User {
   lastActiveAt      DateTime?
   resetTokenHash    String?
   resetTokenExpires DateTime?
-  createdById       String?
-  createdBy         User?      @relation("UserCreations", fields: [createdById], references: [id])
-  createdByMe       User[]            @relation("UserCreations")
+createdById       String?
+  createdBy         User?            @relation("UserCreations", fields: [createdById], references: [id], onDelete: SetNull)
+  createdByMe       User[]           @relation("UserCreations")
   providerConfigs   AiProviderConfig[]
   createdAt         DateTime          @default(now())
   updatedAt         DateTime   @updatedAt

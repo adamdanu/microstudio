@@ -228,3 +228,16 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 .user-chip{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-right:6px}
 .user-chip .email-pill{font-size:12px;line-height:1}
 .user-chip .role-pill{font-size:10px;line-height:1;padding:3px 8px}
+
+/* sidebar user block (bottom) */
+.side-user{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px;margin-bottom:8px;background:var(--panel2);border:1px solid var(--border)}
+.user-avatar{width:34px;height:34px;min-width:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#6d28d9);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+.user-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
+.user-email{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-access{font-size:11px;color:var(--muted)}
+.sidebar.collapsed .side-user{justify-content:center;padding:10px 0}
+.sb-logo{position:relative}
+.sb-logo .collapse-btn{position:absolute;top:-4px;right:-2px;width:22px;height:22px;border-radius:7px;font-size:10px}
+.sidebar.collapsed .sb-logo{padding:4px 2px 16px}
+.topbar-theme{background:var(--panel2);border:1px solid var(--border);color:var(--muted);border-radius:9px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.topbar-theme:hover{color:var(--text)}

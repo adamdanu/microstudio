@@ -3,19 +3,20 @@
 import Link from "next/link"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { Image as ImageIcon, Settings, UserCircle, Sun, Moon, PanelRightClose, PanelRightOpen, LayoutDashboard, Users, LogOut } from "lucide-react"
+import { Image as ImageIcon, Settings, UserCircle, PanelRightClose, PanelRightOpen, LayoutDashboard, Users, LogOut } from "lucide-react"
 import { Logo } from "./Logo"
 import { Wordmark } from "./Wordmark"
 import { useLang } from "@/lib/i18n"
 import { useAuth } from "./AuthProvider"
-import { useTheme } from "./ThemeProvider"
 
 export function Sidebar() {
   const pathname = usePathname()
   const { t } = useLang()
   const { session, logout } = useAuth()
-  const { theme, toggle } = useTheme()
   const [collapsed, setCollapsed] = useState(false)
+  const [confirmLogout, setConfirmLogout] = useState(false)
+
+  const initial = (session?.email || "?").trim().charAt(0).toUpperCase()
 
   const item = (href: string, label: string, icon: React.ReactNode) => {
     const active = pathname === href || pathname.startsWith(href + "/")
@@ -38,10 +39,11 @@ export function Sidebar() {
               <span className="tagline">Microstock Tag Optimizer</span>
             </div>
           )}
+          <button className="collapse-btn" onClick={() => setCollapsed(c => !c)}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+            {collapsed ? <PanelRightOpen size={14} /> : <PanelRightClose size={14} />}
+          </button>
         </div>
-        <button className="collapse-btn" onClick={() => setCollapsed(c => !c)} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
-          {collapsed ? <PanelRightOpen size={18} /> : <PanelRightClose size={18} />}
-        </button>
       </div>
 
       <nav className="side-nav">
@@ -59,15 +61,40 @@ export function Sidebar() {
       </nav>
 
       <div className="side-foot">
-        <button className={`nav-item nav-quit${collapsed ? " collapsed" : ""}`} onClick={logout} title={collapsed ? t("logOut") : undefined}>
+        <div className="side-user">
+          <span className="user-avatar">{initial}</span>
+          {!collapsed && (
+            <div className="user-meta">
+              <span className="user-email">{session?.email}</span>
+              <span className={`pill-tag role-pill${session?.isAdmin ? " admin" : ""}`}>
+                {session?.isAdmin ? "admin" : "user"}
+              </span>
+              <span className="user-access">
+                {session?.remainingDays === null || session?.remainingDays === undefined
+                  ? "Access: Unlimited"
+                  : `Access: ${session.remainingDays} day${session.remainingDays === 1 ? "" : "s"}`}
+              </span>
+            </div>
+          )}
+        </div>
+        <button className="nav-item nav-quit" onClick={() => setConfirmLogout(true)} title={collapsed ? t("logOut") : undefined}>
           <span className="nav-ico"><LogOut size={18} /></span>
           {!collapsed && <span className="nav-lbl">{t("logOut")}</span>}
         </button>
-        <button className="nav-item theme-btn" onClick={toggle} title={theme === "dark" ? "Light mode" : "Dark mode"}>
-          <span className="nav-ico">{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</span>
-          {!collapsed && <span className="nav-lbl">{theme === "dark" ? "Light" : "Dark"}</span>}
-        </button>
       </div>
+
+      {confirmLogout && (
+        <div className="modal-bg" onClick={() => setConfirmLogout(false)}>
+          <div className="modal" style={{ maxWidth: 380 }}>
+            <h2>{t("logOut")}</h2>
+            <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 4, marginBottom: 16 }}>Are you sure you want to log out?</p>
+            <div className="actions" style={{ justifyContent: "flex-end" }}>
+              <button onClick={() => setConfirmLogout(false)}>Cancel</button>
+              <button className="primary" onClick={logout}>Log out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }

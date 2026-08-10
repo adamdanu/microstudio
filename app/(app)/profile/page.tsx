@@ -67,20 +67,8 @@ export default function ProfilePage() {
             <input type="email" value={acc?.email || ""} readOnly style={{ opacity: .7 }} />
           </div>
           <div className="field">
-            <label>Access</label>
-            <input
-              value={acc?.remainingDays === null ? "Unlimited" : `${acc?.remainingDays ?? 0} day${acc?.remainingDays === 1 ? "" : "s"} remaining`}
-              readOnly
-              style={{ opacity: .8, color: (acc?.remainingDays ?? 1) <= 5 ? "var(--danger)" : "var(--ok)" }}
-            />
-          </div>
-          <div className="field">
             <label>Role</label>
             <input value={acc?.role === "ADMIN" ? "admin" : "user"} readOnly style={{ opacity: .7 }} />
-          </div>
-          <div className="field">
-            <label>Expires</label>
-            <input value={acc?.expiresAt ? new Date(acc.expiresAt).toLocaleDateString() : (acc?.accessType === "UNLIMITED" ? "Never (unlimited)" : "—")} readOnly style={{ opacity: .7 }} />
           </div>
         </div>
 

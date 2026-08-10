@@ -1,24 +1,20 @@
 "use client"
 
+import { Sun, Moon } from "lucide-react"
 import { LangToggle } from "./LangToggle"
-import { useLang } from "@/lib/i18n"
-import { useAuth } from "./AuthProvider"
+import { useTheme } from "./ThemeProvider"
 
 export function Topbar() {
-  const { session } = useAuth()
-  const { t } = useLang()
+  const { theme, toggle } = useTheme()
 
   return (
     <header className="topbar">
       <div className="topbar-left">{/* page context slot */}</div>
       <div className="topbar-right">
         <LangToggle />
-        <div className="user-chip">
-          <span className="pill-tag email-pill">{session?.email || ""}</span>
-          <span className={`pill-tag role-pill${session?.isAdmin ? " admin" : ""}`}>
-            {session?.isAdmin ? "admin" : "user"}
-          </span>
-        </div>
+        <button className="topbar-theme" onClick={toggle} title={theme === "dark" ? "Light mode" : "Dark mode"}>
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
       </div>
     </header>
   )

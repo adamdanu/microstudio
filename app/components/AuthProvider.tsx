@@ -6,6 +6,9 @@ export type SessionInfo = {
   email: string
   role: "ADMIN" | "USER"
   isAdmin: boolean
+  accessType?: string
+  remainingDays?: number | null
+  blocked?: boolean
 } | null
 
 const AuthCtx = createContext<{ session: SessionInfo; setSession: (s: SessionInfo) => void; logout: () => void }>({

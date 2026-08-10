@@ -40,6 +40,16 @@ export default function AdminUsers() {
   const [pwTarget, setPwTarget] = useState<Row | null>(null)
   const [pwValue, setPwValue] = useState("")
 
+  // edit-user modal per user
+  const [editTarget, setEditTarget] = useState<Row | null>(null)
+  const [editRole, setEditRole] = useState("USER")
+  const [editStatus, setEditStatus] = useState("ACTIVE")
+  const [editAccess, setEditAccess] = useState("DAYS_30")
+  const [editExpires, setEditExpires] = useState("")
+
+  // delete confirmation modal per user
+  const [delTarget, setDelTarget] = useState<Row | null>(null)
+
   const load = useCallback(async (q?: string) => {
     setLoading(true); setErr(null)
     try {
@@ -80,23 +90,29 @@ export default function AdminUsers() {
     finally { setCreating(false) }
   }
 
-  async function patchUser(u: Row, patch: Record<string, unknown>) {
-    const res = await fetch(`/api/admin/users/${u.id}`, {
+  function openEdit(u: Row) {
+    setEditTarget(u)
+    setEditRole(u.role)
+    setEditStatus(u.status)
+    setEditAccess(u.accessType)
+    setEditExpires(u.expiresAt ? u.expiresAt.slice(0, 10) : "")
+  }
+
+  async function saveEdit() {
+    if (!editTarget) return
+    const patch: Record<string, unknown> = { role: editRole, status: editStatus, accessType: editAccess }
+    if (editAccess === "CUSTOM") patch.expiresAt = new Date(editExpires).toISOString()
+    const res = await fetch(`/api/admin/users/${editTarget.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
     })
     const data = await res.json()
-    if (res.ok) { setMsg(`Updated ${u.email}`); await load(search) }
-    else setErr(data.error || "Update failed")
-  }
-
-  async function changeAccess(u: Row, accessType: string) {
-    const expires = accessType === "CUSTOM"
-      ? window.prompt("Custom expiry date (YYYY-MM-DD):", u.expiresAt ? u.expiresAt.slice(0, 10) : "")
-      : undefined
-    if (accessType === "CUSTOM" && !expires) return
-    await patchUser(u, { accessType, expiresAt: expires })
+    if (res.ok) {
+      setMsg(`Updated ${editTarget.email}`)
+      setEditTarget(null)
+      await load(search)
+    } else setErr(data.error || "Update failed")
   }
 
   async function resetPassword() {
@@ -111,11 +127,11 @@ export default function AdminUsers() {
     else setErr(data.error || "Failed")
   }
 
-  async function deleteUser(u: Row) {
-    if (!window.confirm(`Disable ${u.email}? They will lose access immediately.`)) return
-    const res = await fetch(`/api/admin/users/${u.id}`, { method: "DELETE" })
-    if (res.ok) { setMsg(`Disabled ${u.email}`); await load(search) }
-    else { const d = await res.json().catch(() => ({})); setErr(d.error || "Failed") }
+  async function doDelete() {
+    if (!delTarget) return
+    const res = await fetch(`/api/admin/users/${delTarget.id}`, { method: "DELETE" })
+    if (res.ok) { setMsg(`Deleted ${delTarget.email}`); setDelTarget(null); await load(search) }
+    else { const d = await res.json().catch(() => ({})); setErr(d.error || "Failed"); setDelTarget(null) }
   }
 
   return (
@@ -184,30 +200,22 @@ export default function AdminUsers() {
                   <tr key={r.id}>
                     <td>{r.email}</td>
                     <td>
-                      <select value={r.role} onChange={e => patchUser(r, { role: e.target.value })} disabled={r.email === "adamdanu@gmail.com"}
-                        style={{ padding: "4px 6px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--panel2)", color: "var(--text)", fontSize: 12 }}>
-                        <option value="USER">user</option>
-                        <option value="ADMIN">admin</option>
-                      </select>
+                      <span className="pill-tag" style={{ color: r.role === "ADMIN" ? "var(--accent)" : "var(--muted)", borderColor: "var(--border)" }}>
+                        {r.role.toLowerCase()}
+                      </span>
                     </td>
                     <td>
-                      <select value={r.status} onChange={e => patchUser(r, { status: e.target.value })} disabled={r.email === "adamdanu@gmail.com"}
-                        style={{ padding: "4px 6px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--panel2)", color: "var(--text)", fontSize: 12 }}>
-                        <option value="ACTIVE">active</option>
-                        <option value="DISABLED">disabled</option>
-                      </select>
+                      <span className="pill-tag" style={{ color: r.status === "ACTIVE" ? "var(--ok)" : "var(--danger)" }}>
+                        {r.status.toLowerCase()}
+                      </span>
                     </td>
-                    <td>
-                      <select value={r.accessType} onChange={e => changeAccess(r, e.target.value)} disabled={r.email === "adamdanu@gmail.com"}
-                        style={{ padding: "4px 6px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--panel2)", color: "var(--text)", fontSize: 12 }}>
-                        {ACCESS_TYPES.map(a => <option key={a} value={a}>{a}</option>)}
-                      </select>
-                    </td>
+                    <td className="mono">{r.accessType.toLowerCase().replace("_", " ")}</td>
                     <td>{r.remainingDays === null ? "Unlimited" : `${r.remainingDays}d`}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
                       <button style={{ fontSize: 12, marginRight: 6 }} onClick={() => { setPwTarget(r); setPwValue("") }}>{t("changePw")}</button>
+                      <button style={{ fontSize: 12, marginRight: 6 }} onClick={() => openEdit(r)}>Edit</button>
                       {r.email !== "adamdanu@gmail.com" && (
-                        <button style={{ fontSize: 12, color: "var(--danger)" }} onClick={() => deleteUser(r)}>Delete</button>
+                        <button style={{ fontSize: 12, color: "var(--danger)" }} onClick={() => setDelTarget(r)}>Delete</button>
                       )}
                     </td>
                   </tr>
@@ -228,6 +236,60 @@ export default function AdminUsers() {
             <div className="actions" style={{ justifyContent: "flex-end" }}>
               <button onClick={() => setPwTarget(null)}>Cancel</button>
               <button className="primary" onClick={resetPassword} disabled={pwValue.length < 8}>Set password</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editTarget && (
+        <div className="modal-bg" onClick={e => { if (e.target === e.currentTarget) setEditTarget(null) }}>
+          <div className="modal" style={{ maxWidth: 420 }}>
+            <h2>Edit user</h2>
+            <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>{editTarget.email}</p>
+            <div className="field">
+              <label>Role</label>
+              <select className="login-input" value={editRole} onChange={e => setEditRole(e.target.value)} disabled={editTarget.email === "adamdanu@gmail.com"}>
+                <option value="USER">user</option>
+                <option value="ADMIN">admin</option>
+              </select>
+            </div>
+            <div className="field">
+              <label>Status</label>
+              <select className="login-input" value={editStatus} onChange={e => setEditStatus(e.target.value)} disabled={editTarget.email === "adamdanu@gmail.com"}>
+                <option value="ACTIVE">active</option>
+                <option value="DISABLED">disabled</option>
+              </select>
+            </div>
+            <div className="field">
+              <label>Access</label>
+              <select className="login-input" value={editAccess} onChange={e => setEditAccess(e.target.value)} disabled={editTarget.email === "adamdanu@gmail.com"}>
+                {ACCESS_TYPES.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+            </div>
+            {editAccess === "CUSTOM" && (
+              <div className="field">
+                <label>Expires</label>
+                <input className="login-input" type="date" value={editExpires} onChange={e => setEditExpires(e.target.value)} disabled={editTarget.email === "adamdanu@gmail.com"} />
+              </div>
+            )}
+            <div className="actions" style={{ justifyContent: "flex-end" }}>
+              <button onClick={() => setEditTarget(null)}>Cancel</button>
+              <button className="primary" onClick={saveEdit}>Save changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {delTarget && (
+        <div className="modal-bg" onClick={e => { if (e.target === e.currentTarget) setDelTarget(null) }}>
+          <div className="modal" style={{ maxWidth: 400 }}>
+            <h2>Delete user</h2>
+            <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 4, marginBottom: 16 }}>
+              Delete <strong style={{ color: "var(--text)" }}>{delTarget.email}</strong>? This removes the account permanently.
+            </p>
+            <div className="actions" style={{ justifyContent: "flex-end" }}>
+              <button onClick={() => setDelTarget(null)}>Cancel</button>
+              <button className="primary" style={{ background: "var(--danger)", borderColor: "var(--danger)", color: "#fff" }} onClick={doDelete}>Delete</button>
             </div>
           </div>
         </div>

@@ -66,7 +66,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   })
 }
 
-// DELETE /api/admin/users/[id] -> disable (preserve history + createdBy refs)
+// DELETE /api/admin/users/[id] -> hard delete (removes the user row + their provider configs)
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin()
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -75,11 +75,11 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
   const target = await prisma.user.findUnique({ where: { id } })
   if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 })
   if (target.email === admin.email) {
-    return NextResponse.json({ error: "You cannot disable your own account" }, { status: 400 })
+    return NextResponse.json({ error: "You cannot delete your own account" }, { status: 400 })
   }
 
-  await prisma.user.update({ where: { id }, data: { status: "DISABLED" } })
-  return NextResponse.json({ ok: true })
+  await prisma.user.delete({ where: { id } })
+  return NextResponse.json({ ok: true, deleted: true })
 }
 
 // POST /api/admin/users/[id]/password { password }
