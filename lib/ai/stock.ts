@@ -502,8 +502,8 @@ export async function generateMetadataDual(imageBase64: string, mimeType: string
     ] },
   ] })
   const usage: UsageAccumulator = {
-    tokensIn: (result as any).usage?.promptTokens ?? 0,
-    tokensOut: (result as any).usage?.completionTokens ?? 0,
+    tokensIn: (result as any).usage?.inputTokens ?? (result as any).usage?.promptTokens ?? 0,
+    tokensOut: (result as any).usage?.outputTokens ?? (result as any).usage?.completionTokens ?? 0,
   }
   const o = result.object as { adobe?: any; shutterstock?: any }
   const aRes = o.adobe || {}
