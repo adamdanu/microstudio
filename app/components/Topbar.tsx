@@ -2,7 +2,6 @@
 
 import { Sun, Moon } from "lucide-react"
 import { LangToggle } from "./LangToggle"
-import { Wordmark } from "./Wordmark"
 import { useTheme } from "./ThemeProvider"
 
 export function Topbar() {
@@ -11,9 +10,7 @@ export function Topbar() {
   return (
     <header className="topbar">
       <div className="topbar-left">
-        <div className="logo">
-          <Wordmark size={22} />
-        </div>
+        <span className="topbar-title">Microstock Tag Optimizer</span>
       </div>
       <div className="topbar-right">
         <LangToggle />

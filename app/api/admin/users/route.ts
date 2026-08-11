@@ -18,7 +18,7 @@ function computeExpiresAt(accessType: string, customDate?: string): Date | null 
 function remainingDays(expiresAt: Date | null, accessType: string): number | null {
   if (accessType === "UNLIMITED") return null
   if (!expiresAt) return null
-  return Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / DAY_MS))
+  return Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / DAY_MS))
 }
 
 async function requireAdmin() {

@@ -38,6 +38,7 @@ model User {
   createdByMe       User[]            @relation("UserCreations")
   providerConfigs   AiProviderConfig[]
   activities        ActivityLog[]
+  analyses          AnalysisLog[]
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
@@ -49,6 +50,19 @@ model ActivityLog {
   action    String
   detail    String?
   ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AnalysisLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    String
+  tokensIn  Int      @default(0)
+  tokensOut Int      @default(0)
   createdAt DateTime @default(now())
 
   @@index([userId])

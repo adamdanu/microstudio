@@ -320,19 +320,34 @@ function extractContent(d: any): string {
   return content
 }
 
+export interface UsageAccumulator {
+  tokensIn: number
+  tokensOut: number
+}
+
+// Captures `usage` from an OpenAI-compatible chat completion response into the
+// accumulator (best-effort; missing usage is treated as 0).
+function accUsage(d: any, acc?: UsageAccumulator): any {
+  if (acc && d?.usage) {
+    acc.tokensIn += d.usage.prompt_tokens ?? 0
+    acc.tokensOut += d.usage.completion_tokens ?? 0
+  }
+  return d
+}
+
 // Stage 1 — vision model reads the image → short factual description.
 // Uses the user-configured `config.model` as the PRIMARY model. Fallback models are
 // read from env (comma-separated, optional) — never hardcoded, so the operator can
 // customize the openai-compatible chain entirely from configuration.
 const VISION_FALLBACKS = (process.env.MICROSTUDIO_VISION_FALLBACKS || '')
   .split(',').map(s => s.trim()).filter(Boolean)
-async function describeImage(imageBase64: string, mimeType: string, config: AIProviderConfig): Promise<string> {
+async function describeImage(imageBase64: string, mimeType: string, config: AIProviderConfig, acc?: UsageAccumulator): Promise<string> {
   const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
   const chain = Array.from(new Set([config.model, ...VISION_FALLBACKS].filter(Boolean)))
   let lastErr: unknown = null
   for (const model of chain) {
     try {
-      const d = await chatCompletions(baseURL, config.apiKey || '', {
+      const d = accUsage(await chatCompletions(baseURL, config.apiKey || '', {
         model,
         stream: false,
         temperature: 0.2,
@@ -347,7 +362,7 @@ async function describeImage(imageBase64: string, mimeType: string, config: AIPr
             ],
           },
         ],
-      }, 45000)
+      }, 45000), acc)
       const desc = extractContent(d)
       if (desc && desc.trim().length > 0) return desc
     } catch (e) {
@@ -371,7 +386,7 @@ function stage2Chain(config: AIProviderConfig): string[] {
   return Array.from(new Set([config.model, ...STAGE2_FALLBACKS].filter(Boolean)))
 }
 
-async function platformFromDescription(platform: Platform, description: string, config: AIProviderConfig): Promise<StockMetadata> {
+async function platformFromDescription(platform: Platform, description: string, config: AIProviderConfig, acc?: UsageAccumulator): Promise<StockMetadata> {
   const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
   const isShutter = platform === 'shutterstock'
   const maxKw = isShutter ? 50 : 45
@@ -380,7 +395,7 @@ async function platformFromDescription(platform: Platform, description: string, 
   for (const model of stage2Chain(config)) {
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
-        const d = await chatCompletions(baseURL, config.apiKey || '', {
+        const d = accUsage(await chatCompletions(baseURL, config.apiKey || '', {
           model,
           stream: false,
           temperature: 0.3,
@@ -389,7 +404,7 @@ async function platformFromDescription(platform: Platform, description: string, 
             { role: 'system', content: PLATFORM_FROM_DESC_SYSTEM[platform] },
             { role: 'user', content: `Image description: ${description}\n\nReturn ONLY valid JSON matching: ${PLATFORM_SHAPES[platform]}` },
           ],
-        })
+        }), acc)
         const content = extractContent(d)
         let parsed: any
         try {
@@ -455,20 +470,23 @@ function extractSingleJson(raw: string): any | null {
 }
 
 // ONE vision call → both platform packs. Halves token cost vs calling twice per image.
-export async function generateMetadataDual(imageBase64: string, mimeType: string, config: AIProviderConfig): Promise<DualMetadata> {
+// Returns the packs plus a usage accumulator for analytics (tokens in/out across all
+// provider calls made for this image).
+export async function generateMetadataDual(imageBase64: string, mimeType: string, config: AIProviderConfig): Promise<DualMetadata & { usage: UsageAccumulator }> {
   // openai-compatible (e.g. 9Router / DeepSeek) — blind-see two-stage: describe once, then
   // adobe + shutterstock generated IN PARALLEL from the description (text only, fast, no image tokens).
   if (config.provider === 'openai-compatible' || config.provider === 'deepseek') {
     const baseURL = (config.baseURL || 'https://api.openai.com/v1').replace(/\/$/, '')
-    const description = await describeImage(imageBase64, mimeType, config)
+    const usage: UsageAccumulator = { tokensIn: 0, tokensOut: 0 }
+    const description = await describeImage(imageBase64, mimeType, config, usage)
     if (!description && description.length === 0) {
       throw new Error('Vision model returned an empty description. Raw reply above.')
     }
     const [adobe, shutterstock] = await Promise.all([
-      platformFromDescription('adobe', description, config).catch(e => { throw e }),
-      platformFromDescription('shutterstock', description, config).catch(e => { throw e }),
+      platformFromDescription('adobe', description, config, usage).catch(e => { throw e }),
+      platformFromDescription('shutterstock', description, config, usage).catch(e => { throw e }),
     ])
-    return { adobe, shutterstock }
+    return { adobe, shutterstock, usage }
   }
 
   // Native SDK providers (openai/anthropic/google) — generateObject with dual schema
@@ -483,6 +501,10 @@ export async function generateMetadataDual(imageBase64: string, mimeType: string
       { type: 'image', image: new Uint8Array(Buffer.from(imageBase64, 'base64')), mediaType: mimeType },
     ] },
   ] })
+  const usage: UsageAccumulator = {
+    tokensIn: (result as any).usage?.promptTokens ?? 0,
+    tokensOut: (result as any).usage?.completionTokens ?? 0,
+  }
   const o = result.object as { adobe?: any; shutterstock?: any }
   const aRes = o.adobe || {}
   const sRes = o.shutterstock || {}
@@ -507,6 +529,7 @@ export async function generateMetadataDual(imageBase64: string, mimeType: string
       keywords: kwSlice(sKw, 50),
       categories: pickCategoryList(sRes.categories || sRes.category, 2),
     },
+    usage,
   }
 }
 

@@ -3,14 +3,17 @@ import { getStoredConfig, getEnabledProviders } from '@/lib/ai/stored-config'
 import { generateMetadataDual } from '@/lib/ai/stock'
 import { getSessionUser, updateLastActive } from '@/lib/auth'
 import { recordActivity } from '@/lib/activity'
+import { recordAnalysis } from '@/lib/analysis'
 import type { AIProvider } from '@/lib/ai/adapter'
 
 export async function POST(req: Request) {
+  let userId: string | null = null
   try {
     const user = await getSessionUser()
     if (!user || user.blocked) {
       return NextResponse.json({ error: 'Access expired or account disabled' }, { status: 403 })
     }
+    userId = user.id
     updateLastActive(user.email)
     recordActivity(user.id, 'analyze', 'Ran image analysis')
 
@@ -37,9 +40,16 @@ export async function POST(req: Request) {
     }
 
     const result = await generateMetadataDual(image, mimeType || 'image/png', config)
-    return NextResponse.json({ ...result, provider: prov })
+    const { usage, ...packs } = result
+    // Per-analysis success + token usage, best-effort (never blocks the response)
+    const { adobe, shutterstock } = packs
+    const success = !!adobe?.title?.en && !!shutterstock?.title?.en
+    await recordAnalysis(user.id, success ? 'SUCCESS' : 'FAIL', usage?.tokensIn ?? 0, usage?.tokensOut ?? 0).catch(() => {})
+    return NextResponse.json({ ...packs, provider: prov })
   } catch (e) {
     console.error(e)
+    // Record the failure for analytics (tokens unavailable on error path)
+    if (userId) await recordAnalysis(userId, 'FAIL', 0, 0).catch(() => {})
     const msg = e instanceof Error ? e.message : 'Failed to analyze'
     return NextResponse.json({ error: msg }, { status: 500 })
   }

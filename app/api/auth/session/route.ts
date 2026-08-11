@@ -9,7 +9,7 @@ export async function GET() {
     role: user.role,
     isAdmin: user.isAdmin,
     accessType: user.accessType,
-    remainingDays: user.accessType === "UNLIMITED" ? null : Math.max(0, Math.floor(((user.expiresAt?.getTime() || 0) - Date.now()) / 86400000)),
+    remainingDays: user.accessType === "UNLIMITED" ? null : Math.max(0, Math.ceil(((user.expiresAt?.getTime() || 0) - Date.now()) / 86400000)),
     blocked: user.blocked,
   })
 }
