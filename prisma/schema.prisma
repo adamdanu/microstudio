@@ -111,6 +111,8 @@ model GeminiKey {
   cooldownUntil    DateTime?
   lastUsedAt       DateTime?
   consecutiveFails Int           @default(0)
+  successCount     Int           @default(0)
+  requestCount     Int           @default(0)
   createdAt        DateTime      @default(now())
 
   @@index([poolId])

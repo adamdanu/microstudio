@@ -67,7 +67,14 @@ export async function markKeyFailure(keyId: string, errMsg?: string): Promise<vo
     if (!key) return
 
     const transient = !/\b(429|403|400|quota|denied|PERMISSION_DENIED|RESOURCE_EXHAUSTED)\b/i.test(errMsg || "")
-    if (!transient) return // quota/denied: keep key usable, don't cooldown
+    if (!transient) {
+      // quota/denied: keep key usable, don't cooldown, but still count the attempt
+      await prisma.geminiKey.update({
+        where: { id: keyId },
+        data: { requestCount: { increment: 1 } },
+      })
+      return
+    }
 
     const fails = key.consecutiveFails + 1
     const backoff = COOLDOWN_BASE_MS * Math.pow(2, Math.min(fails, 6))
@@ -76,6 +83,7 @@ export async function markKeyFailure(keyId: string, errMsg?: string): Promise<vo
       data: {
         consecutiveFails: fails,
         cooldownUntil: new Date(Date.now() + backoff),
+        requestCount: { increment: 1 },
       },
     })
   } catch { /* best-effort */ }
@@ -86,7 +94,7 @@ export async function markKeySuccess(keyId: string): Promise<void> {
   try {
     await prisma.geminiKey.update({
       where: { id: keyId },
-      data: { lastUsedAt: new Date(), consecutiveFails: 0, cooldownUntil: null },
+      data: { lastUsedAt: new Date(), consecutiveFails: 0, cooldownUntil: null, successCount: { increment: 1 }, requestCount: { increment: 1 } },
     })
   } catch { /* best-effort */ }
 }

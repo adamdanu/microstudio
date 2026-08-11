@@ -42,6 +42,8 @@ export async function GET() {
         lastUsedAt: k.lastUsedAt,
         consecutiveFails: k.consecutiveFails,
         cooldownUntil: k.cooldownUntil,
+        successCount: k.successCount,
+        requestCount: k.requestCount,
       })),
     })),
   })

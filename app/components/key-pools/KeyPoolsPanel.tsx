@@ -12,6 +12,8 @@ type PoolKey = {
   lastUsedAt: string | null
   consecutiveFails: number
   cooldownUntil: string | null
+  successCount: number
+  requestCount: number
 }
 type Pool = {
   id: string
@@ -166,7 +168,7 @@ export function KeyPoolsPanel() {
           {expanded[p.id] && (
             <div style={{ marginTop: 10 }}>
               <table className="admin-table">
-                <thead><tr><th>Key</th><th>Model</th><th>Status</th><th>Last used</th><th>Fails</th><th></th></tr></thead>
+                <thead><tr><th>Key</th><th>Model</th><th>Status</th><th>Last used</th><th>Success</th><th>Fails</th><th></th></tr></thead>
                 <tbody>
                   {p.keys.map(k => (
                     <tr key={k.id}>
@@ -180,6 +182,10 @@ export function KeyPoolsPanel() {
                         </span>
                       </td>
                       <td className="mono">{k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleString() : "—"}</td>
+                      <td className="mono" title={`${k.successCount}/${k.requestCount} requests succeeded`}>
+                        {k.successCount}
+                        {k.requestCount > 0 && <span style={{ color: "var(--muted)", fontSize: 11 }}> · {Math.round((k.successCount / k.requestCount) * 100)}%</span>}
+                      </td>
                       <td>{k.consecutiveFails}</td>
                       <td style={{ whiteSpace: "nowrap" }}>
                         <button style={{ fontSize: 12, marginRight: 6 }} onClick={() => toggleKey(p.id, k.id)}>{k.isActive ? "Disable" : "Enable"}</button>
