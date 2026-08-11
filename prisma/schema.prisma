@@ -39,6 +39,9 @@ model User {
   providerConfigs   AiProviderConfig[]
   activities        ActivityLog[]
   analyses          AnalysisLog[]
+  geminiPoolId      String?
+  geminiPool        GeminiKeyPool?    @relation("PoolUsers", fields: [geminiPoolId], references: [id], onDelete: SetNull)
+  managedPools      GeminiKeyPool[]   @relation("PoolAdmin")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
@@ -83,4 +86,31 @@ enum AccessType {
   DAYS_30
   UNLIMITED
   CUSTOM
+}
+
+model GeminiKeyPool {
+  id        String      @id @default(cuid())
+  name      String
+  relayUrl  String?
+  adminId   String?
+  admin     User?       @relation("PoolAdmin", fields: [adminId], references: [id], onDelete: SetNull)
+  keys      GeminiKey[]
+  users     User[]      @relation("PoolUsers")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model GeminiKey {
+  id               String        @id @default(cuid())
+  poolId           String
+  pool             GeminiKeyPool @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  apiKey           String
+  model            String
+  isActive         Boolean       @default(true)
+  cooldownUntil    DateTime?
+  lastUsedAt       DateTime?
+  consecutiveFails Int           @default(0)
+  createdAt        DateTime      @default(now())
+
+  @@index([poolId])
 }

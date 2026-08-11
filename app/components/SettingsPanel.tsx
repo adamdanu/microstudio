@@ -17,6 +17,7 @@ export function SettingsPanel() {
   const [editing, setEditing] = useState(true)
   const [models, setModels] = useState<string[]>([])
   const [loadingModels, setLoadingModels] = useState(false)
+  const [pool, setPool] = useState<{ id: string; name: string } | null>(null)
 
   const defaultCfg = (prov: string): Config => ({ provider: prov, apiKey: null, baseURL: null, model: null, enabled: false, sortOrder: 0 })
 
@@ -33,6 +34,12 @@ export function SettingsPanel() {
   }
 
   useEffect(() => { loadConfigs().then(() => setLoading(false)) }, [])
+
+  useEffect(() => {
+    fetch("/api/key-pools/assigned").then(r => r.json()).then(d => {
+      if (d.pool) setPool(d.pool)
+    }).catch(() => {})
+  }, [])
 
   const p = PROVIDER_META.find(x => x.id === selected)!
   const c: Config = draft || defaultCfg(selected)
@@ -99,8 +106,13 @@ export function SettingsPanel() {
   return (
     <section className="card" style={{ maxWidth: 860, margin: "0 auto" }}>
       <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", marginBottom: 16 }}>{t("settingsTitle")}</h3>
+      {pool && (
+        <div className="batchbar" style={{ marginBottom: 16, borderColor: "var(--accent)", color: "var(--accent)" }}>
+          Using Gemini Key Pool: <strong>{pool.name}</strong> (admin-managed)
+        </div>
+      )}
       {loading ? <div className="empty"><span className="spinner" /></div> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, opacity: pool ? 0.45 : 1, pointerEvents: pool ? "none" : "auto" }}>
           <div>
             <label style={{ fontSize: 12, color: "var(--muted)", display: "block", marginBottom: 8 }}>{t("fallbackPriority")}</label>
             <div className="card" style={{ padding: 12, minHeight: 320 }}>

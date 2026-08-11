@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { Image as ImageIcon, Settings, UserCircle, LayoutDashboard, Users, LogOut, Activity, BarChart3, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { Image as ImageIcon, Settings, UserCircle, LayoutDashboard, Users, LogOut, Activity, BarChart3, PanelLeftClose, PanelLeftOpen, KeyRound } from "lucide-react"
 import { Logo } from "./Logo"
 import { Wordmark } from "./Wordmark"
 import { useLang } from "@/lib/i18n"
@@ -60,6 +60,7 @@ export function Sidebar() {
             {!collapsed && <div className="side-sec">{t("adminSec")}</div>}
             {item("/admin/dashboard", t("adminDashboard"), <LayoutDashboard size={18} />)}
             {item("/admin/analytics", t("adminAnalytics"), <BarChart3 size={18} />)}
+            {item("/admin/key-pools", "Key Pools", <KeyRound size={18} />)}
             {item("/admin/activity", t("activityLog"), <Activity size={18} />)}
             {item("/admin/users", t("adminUtilities"), <Users size={18} />)}
           </>
