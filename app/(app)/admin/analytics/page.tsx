@@ -19,7 +19,7 @@ type SeriesRow = { bucket: string; requests: number; success: number; failed: nu
 type PerUserRow = { userId: string; email: string; requests: number; success: number; failed: number; tokensIn: number; tokensOut: number; avgTokensPerReq: number }
 
 const RANGES = [
-  { id: "all", label: "All time" }, { id: "7d", label: "7 days" }, { id: "30d", label: "30 days" },
+  { id: "today", label: "Today" }, { id: "all", label: "All time" }, { id: "7d", label: "7 days" }, { id: "30d", label: "30 days" },
   { id: "90d", label: "90 days" }, { id: "1y", label: "1 year" },
 ]
 const INTERVALS = [

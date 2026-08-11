@@ -155,6 +155,9 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 .btn:hover{filter:brightness(1.15)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#062a30}
 .feature-ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(34,211,238,.1);color:var(--accent);border:1px solid rgba(34,211,238,.25);margin-bottom:14px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1080px;margin:0 auto;width:100%;padding:0 24px 48px}
+.feature{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;transition:.15s}
+.feature:hover{border-color:var(--accent);transform:translateY(-2px)}
 .features h3{font-size:16px;margin-bottom:8px}
 .features p{color:var(--muted);font-size:14px;line-height:1.55}
 .landing-footer{max-width:1080px;margin:0 auto;width:100%;padding:22px 24px;display:flex;justify-content:space-between;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
@@ -241,11 +244,10 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 .pagination-btns button{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;font-size:12.5px;cursor:pointer}
 .pagination-btns button:disabled{opacity:.4;cursor:not-allowed}
 
-/* collapse handle on the sidebar-right boundary */
+/* collapse handle on the sidebar-right boundary — icon only, no box */
 .sidebar{position:relative}
-.collapse-handle{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--border);border-radius:0 8px 8px 0;color:var(--muted);cursor:pointer;font-size:15px;font-weight:700;z-index:5;user-select:none}
+.collapse-handle{position:absolute;top:50%;right:-14px;transform:translateY(-50%);width:28px;height:36px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:var(--muted);cursor:pointer;z-index:5;user-select:none}
 .collapse-handle:hover{color:var(--accent)}
-.collapse-handle.collapsed{border-radius:8px 0 0 8px}
 /* topbar title */
 .topbar-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.01em}
 

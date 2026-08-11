@@ -9,6 +9,7 @@ type Interval = (typeof VALID_INTERVALS)[number]
 
 const VALID_RANGES: Record<string, number | null> = {
   all: null,
+  today: 1,
   "7d": 7,
   "30d": 30,
   "90d": 90,
@@ -16,6 +17,12 @@ const VALID_RANGES: Record<string, number | null> = {
 }
 
 function parseFrom(from: string | null): Date | null {
+  if (from === "today") {
+    // calendar today (user-local) — from local midnight
+    const now = new Date()
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    return start
+  }
   const days = VALID_RANGES[from || "all"]
   if (days == null) return null
   return new Date(Date.now() - days * DAY_MS)
