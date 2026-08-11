@@ -82,6 +82,9 @@ export default function AdminAnalytics() {
           </select>
         </div>
       </div>
+      <p className="analytics-hint">
+        Range = how far back (All time / 7 / 30 / 90 days / 1 year) · Interval = chart grouping (Daily / Weekly / Monthly / Yearly). Tip: small range + Daily, large range + Monthly.
+      </p>
 
       {err && <div className="danger" style={{ color: "var(--danger)", marginBottom: 12 }}>{err}</div>}
       {loading ? <div className="empty"><span className="spinner" /></div> : agg && (

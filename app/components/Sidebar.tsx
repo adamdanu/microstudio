@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { Image as ImageIcon, Settings, UserCircle, LayoutDashboard, Users, LogOut, Activity, BarChart3 } from "lucide-react"
+import { Image as ImageIcon, Settings, UserCircle, LayoutDashboard, Users, LogOut, Activity, BarChart3, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 import { Logo } from "./Logo"
 import { Wordmark } from "./Wordmark"
 import { useLang } from "@/lib/i18n"
@@ -43,7 +43,7 @@ export function Sidebar() {
 
       <span className={`collapse-handle${collapsed ? " collapsed" : ""}`} onClick={() => setCollapsed(c => !c)}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
-        {collapsed ? ">" : "<"}
+        {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
       </span>
 
       <nav className="side-nav">
