@@ -384,6 +384,12 @@ export default function Home() {
 
           {!loading && result && (
             <>
+              {image && (
+                <div className="result-img">
+                  <img src={image.dataUrl} alt={image.fileName} />
+                  <span className="result-img-name">{image.fileName}</span>
+                </div>
+              )}
               {image?.provider && (
                 <div className="hint" style={{ marginBottom: 10 }}>{t("analyzedBy")} <strong>{PROVIDER_LABELS[image.provider as ProviderName] || image.provider}</strong></div>
               )}

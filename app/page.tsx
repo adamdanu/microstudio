@@ -21,7 +21,7 @@ export default function LandingPage() {
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <LangToggle />
-          <Link className="btn" href="/login">{t("signIn")}</Link>
+          <Link className="btn nav-signin" href="/login">{t("signIn")}</Link>
         </div>
       </nav>
 
@@ -57,6 +57,10 @@ export default function LandingPage() {
       <footer className="landing-footer">
         <span>© 2026 MicroStudio</span>
       </footer>
+
+      <div className="landing-mobile-cta">
+        <Link className="btn primary" href="/login">{t("signIn")}</Link>
+      </div>
     </main>
   )
 }
