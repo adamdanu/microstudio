@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         await recordAnalysis(user.id, 'SUCCESS', usage?.tokensIn ?? 0, usage?.tokensOut ?? 0).catch(() => {})
         return NextResponse.json({ ...packs, provider: 'gemini-pool' })
       } catch (e) {
-        await markKeyFailure(sel.key.id)
+        await markKeyFailure(sel.key.id, e instanceof Error ? e.message : String(e))
         console.error(e)
         const msg = e instanceof Error ? e.message : 'Failed to analyze'
         return NextResponse.json({ error: msg }, { status: 500 })

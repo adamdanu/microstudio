@@ -57,10 +57,18 @@ export async function selectKey(poolId: string): Promise<PoolSelection> {
 }
 
 // Mark a key as failed (429/5xx): back off exponentially and increment the counter.
-export async function markKeyFailure(keyId: string): Promise<void> {
+// Mark a key as failed. Transient errors (5xx) get cooldown so traffic shifts to
+// another key. Quota/authorization errors (429 quota, 403, 400 invalid key) are
+// project-wide, not per-key blips — cooldown is pointless, so leave the key active
+// and surface the real error instead of masking it as "no usable keys".
+export async function markKeyFailure(keyId: string, errMsg?: string): Promise<void> {
   try {
     const key = await prisma.geminiKey.findUnique({ where: { id: keyId } })
     if (!key) return
+
+    const transient = !/\b(429|403|400|quota|denied|PERMISSION_DENIED|RESOURCE_EXHAUSTED)\b/i.test(errMsg || "")
+    if (!transient) return // quota/denied: keep key usable, don't cooldown
+
     const fails = key.consecutiveFails + 1
     const backoff = COOLDOWN_BASE_MS * Math.pow(2, Math.min(fails, 6))
     await prisma.geminiKey.update({
