@@ -89,15 +89,16 @@ enum AccessType {
 }
 
 model GeminiKeyPool {
-  id        String      @id @default(cuid())
-  name      String
-  relayUrl  String?
-  adminId   String?
-  admin     User?       @relation("PoolAdmin", fields: [adminId], references: [id], onDelete: SetNull)
-  keys      GeminiKey[]
-  users     User[]      @relation("PoolUsers")
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id         String      @id @default(cuid())
+  name       String
+  relayUrl   String?
+  relayToken String?
+  adminId    String?
+  admin      User?       @relation("PoolAdmin", fields: [adminId], references: [id], onDelete: SetNull)
+  keys       GeminiKey[]
+  users      User[]      @relation("PoolUsers")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 model GeminiKey {

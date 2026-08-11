@@ -289,7 +289,7 @@ const PLATFORM_SHAPES = {
   shutterstock: '{"title":{"en":"","de":"","ar":""},"description":{"en":"","de":"","ar":""},"keywords":{"en":[""],"de":[""],"ar":[""]},"categories":[""]}',
 }
 
-function chatCompletions(baseURL: string, apiKey: string, payload: Record<string, unknown>, timeoutMs = 60000): Promise<any> {
+function chatCompletions(baseURL: string, apiKey: string, payload: Record<string, unknown>, timeoutMs = 60000, relayToken?: string): Promise<any> {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), timeoutMs)
   return fetch(`${baseURL}/chat/completions`, {
@@ -297,6 +297,7 @@ function chatCompletions(baseURL: string, apiKey: string, payload: Record<string
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey || ''}`,
+      ...(relayToken ? { 'x-relay-token': relayToken } : {}),
     },
     body: JSON.stringify(payload),
     signal: ctrl.signal,
@@ -362,7 +363,7 @@ async function describeImage(imageBase64: string, mimeType: string, config: AIPr
             ],
           },
         ],
-      }, 45000), acc)
+      }, 45000, config.relayToken), acc)
       const desc = extractContent(d)
       if (desc && desc.trim().length > 0) return desc
     } catch (e) {
@@ -404,7 +405,7 @@ async function platformFromDescription(platform: Platform, description: string, 
             { role: 'system', content: PLATFORM_FROM_DESC_SYSTEM[platform] },
             { role: 'user', content: `Image description: ${description}\n\nReturn ONLY valid JSON matching: ${PLATFORM_SHAPES[platform]}` },
           ],
-        }), acc)
+        }, 60000, config.relayToken), acc)
         const content = extractContent(d)
         let parsed: any
         try {

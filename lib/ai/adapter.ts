@@ -11,6 +11,7 @@ export interface AIProviderConfig {
   model: AIModel
   baseURL?: string
   apiKey?: string
+  relayToken?: string
 }
 
 const DEFAULT_MODELS: Record<AIProvider, string> = {

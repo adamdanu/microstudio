@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await ctx.params
 
-  let body: { name?: string; relayUrl?: string }
+  let body: { name?: string; relayUrl?: string; relayToken?: string }
   try {
     body = await req.json()
   } catch {
@@ -33,6 +33,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const data: Record<string, unknown> = {}
   if (body.name !== undefined) data.name = body.name.trim() || pool.name
   if (body.relayUrl !== undefined) data.relayUrl = body.relayUrl.trim() || null
+  if (body.relayToken !== undefined) data.relayToken = body.relayToken.trim() || null
 
   await prisma.geminiKeyPool.update({ where: { id }, data })
   await recordActivity(admin.id, "pool_edit", `Edited Gemini key pool ${pool.name}`)

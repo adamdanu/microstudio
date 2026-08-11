@@ -32,6 +32,7 @@ export function KeyPoolsPanel() {
   // create form
   const [name, setName] = useState("")
   const [relayUrl, setRelayUrl] = useState("")
+  const [relayToken, setRelayToken] = useState("")
   const [keysText, setKeysText] = useState("")
   const [model, setModel] = useState("gemini-2.5-flash")
   const [creating, setCreating] = useState(false)
@@ -63,10 +64,10 @@ export function KeyPoolsPanel() {
       const res = await fetch("/api/admin/key-pools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, relayUrl, keys: keysText.split("\n"), model }),
+        body: JSON.stringify({ name, relayUrl, relayToken, keys: keysText.split("\n"), model }),
       })
       const d = await res.json()
-      if (res.ok) { setMsg(`Created pool ${d.pool.name}`); setName(""); setRelayUrl(""); setKeysText(""); await load() }
+      if (res.ok) { setMsg(`Created pool ${d.pool.name}`); setName(""); setRelayUrl(""); setRelayToken(""); setKeysText(""); await load() }
       else setErr(d.error || "Create failed")
     } catch { setErr("Create failed") }
     finally { setCreating(false) }
@@ -126,6 +127,10 @@ export function KeyPoolsPanel() {
           <div>
             <label style={{ fontSize: 11, color: "var(--muted)", display: "block", marginBottom: 4 }}>Relay URL (Vercel)</label>
             <input className="login-input" value={relayUrl} onChange={e => setRelayUrl(e.target.value)} placeholder="https://microstudio-relay.vercel.app" />
+          </div>
+          <div>
+            <label style={{ fontSize: 11, color: "var(--muted)", display: "block", marginBottom: 4 }}>Relay token (x-relay-token)</label>
+            <input className="login-input" value={relayToken} onChange={e => setRelayToken(e.target.value)} placeholder="RELAY_AUTH_TOKEN" />
           </div>
           <div>
             <label style={{ fontSize: 11, color: "var(--muted)", display: "block", marginBottom: 4 }}>Model</label>

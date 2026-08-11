@@ -35,15 +35,23 @@ export async function selectKey(poolId: string): Promise<PoolSelection> {
   if (usable.length === 0) return null
 
   const key = usable[0]
+  // The app's chatCompletions appends "/chat/completions". The Vercel relay
+  // serves that at "/api/chat/completions", so ensure the relay baseURL ends
+  // with "/api" (unless the admin already included it or provided a custom path).
+  const relayBase = (pool.relayUrl || "").replace(/\/+$/, "")
+  const baseURL = relayBase
+    ? relayBase.endsWith("/api")
+      ? relayBase
+      : relayBase + "/api"
+    : "https://generativelanguage.googleapis.com/v1beta"
   return {
     key: { id: key.id, apiKey: key.apiKey, model: key.model },
     config: {
       provider: "openai-compatible",
       model: key.model,
-      // Calls go through the relay; it forwards to Gemini. If no relay configured,
-      // fall back to direct Gemini (still works, but from the box's IP).
-      baseURL: pool.relayUrl || "https://generativelanguage.googleapis.com/v1beta",
+      baseURL,
       apiKey: key.apiKey,
+      relayToken: pool.relayToken || undefined,
     },
   }
 }

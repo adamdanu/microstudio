@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   const admin = await requireAdmin()
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  let body: { name?: string; relayUrl?: string; keys?: string[]; model?: string }
+  let body: { name?: string; relayUrl?: string; relayToken?: string; keys?: string[]; model?: string }
   try {
     body = await req.json()
   } catch {
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
   }
   const name = (body.name || "").trim()
   const relayUrl = (body.relayUrl || "").trim() || null
+  const relayToken = (body.relayToken || "").trim() || null
   const keys = (body.keys || []).map(k => k.trim()).filter(Boolean)
   const model = (body.model || "gemini-2.5-flash").trim()
 
@@ -70,6 +71,7 @@ export async function POST(req: NextRequest) {
     data: {
       name,
       relayUrl,
+      relayToken,
       adminId: admin.id,
       keys: { create: keys.map(apiKey => ({ apiKey, model })) },
     },
