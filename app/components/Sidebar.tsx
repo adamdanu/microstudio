@@ -8,11 +8,13 @@ import { Logo } from "./Logo"
 import { Wordmark } from "./Wordmark"
 import { useLang } from "@/lib/i18n"
 import { useAuth } from "./AuthProvider"
+import { useSideOverlay } from "./SideOverlay"
 
 export function Sidebar() {
   const pathname = usePathname()
   const { t } = useLang()
   const { session, logout } = useAuth()
+  const { open, setOpen } = useSideOverlay()
   const [collapsed, setCollapsed] = useState(false)
   const [confirmLogout, setConfirmLogout] = useState(false)
 
@@ -21,7 +23,7 @@ export function Sidebar() {
   const item = (href: string, label: string, icon: React.ReactNode) => {
     const active = pathname === href || pathname.startsWith(href + "/")
     return (
-      <Link href={href} className={`nav-item${active ? " active" : ""}${collapsed ? " collapsed" : ""}`} prefetch={false} title={collapsed ? label : undefined}>
+      <Link href={href} className={`nav-item${active ? " active" : ""}${collapsed ? " collapsed" : ""}`} prefetch={false} title={collapsed ? label : undefined} onClick={() => setOpen(false)}>
         <span className="nav-ico">{icon}</span>
         {!collapsed && <span className="nav-lbl">{label}</span>}
       </Link>
@@ -29,7 +31,9 @@ export function Sidebar() {
   }
 
   return (
-    <aside className={`sidebar${collapsed ? " collapsed" : ""}`}>
+    <>
+      <div className={`side-overlay${open ? " show" : ""}`} onClick={() => setOpen(false)} />
+      <aside className={`sidebar${collapsed ? " collapsed" : ""}${open ? " open" : ""}`}>
       <div className="sidebar-head">
         <div className="logo sb-logo">
           <Logo size={38} />
@@ -97,6 +101,7 @@ export function Sidebar() {
           </div>
         </div>
       )}
-    </aside>
+      </aside>
+    </>
   )
 }

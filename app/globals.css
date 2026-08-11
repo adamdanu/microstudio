@@ -211,7 +211,9 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 .nav-quit{color:var(--danger)}
 .shell-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--bg)}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0}
 .topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.menu-btn{display:none}
 .role-pill{border:1px solid var(--border)}
 .role-pill.admin{border-color:var(--accent);color:var(--accent)}
 .email-pill{font-family:ui-monospace,monospace}
@@ -253,3 +255,59 @@ button.link{background:none;border:none;color:var(--accent);font-size:13px}
 
 /* analytics helper text */
 .analytics-hint{font-size:12px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+
+/* ── dual result panels (studio) ─────────────────────────────── */
+.dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dual-panel{padding:16px}
+
+/* ── responsive app shell ────────────────────────────────────── */
+@media (max-width: 900px){
+  .dual-grid{grid-template-columns:1fr}
+  .analytics-grid{grid-template-columns:1fr}
+}
+@media (max-width: 768px){
+  /* sidebar -> fixed off-canvas drawer */
+  .shell{position:relative}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:250px;min-width:250px;z-index:60;
+    transform:translateX(-105%);transition:transform .2s ease;
+    box-shadow:0 0 40px rgba(0,0,0,.4)}
+  .sidebar.open{transform:translateX(0)}
+  .shell-main{width:100%}
+  .topbar{padding:10px 14px;flex-wrap:nowrap}
+  .topbar-title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar-right{gap:6px}
+  /* hamburger */
+  .menu-btn{display:inline-flex;align-items:center;justify-content:center;
+    background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:9px;cursor:pointer}
+  /* collapse handle hidden on mobile (drawer instead) */
+  .collapse-handle{display:none}
+  /* sidebar overlay backdrop */
+  .side-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55;display:none}
+  .side-overlay.show{display:block}
+  .wrap{padding:14px}
+}
+@media (max-width: 640px){
+  .topbar .email-pill{display:none}
+  .results-head{flex-direction:column;align-items:stretch;gap:10px}
+  .results-head input[type=search],.results-head select{width:100%!important}
+  .admin-table{font-size:12px}
+  .admin-table th,.admin-table td{padding:7px 8px}
+  .side-user{padding:8px 6px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .pagination{flex-direction:column;align-items:stretch}
+  .pagination-btns{justify-content:space-between}
+}
+
+/* ── mobile: landing + auth ──────────────────────────────────── */
+@media (max-width: 640px){
+  .landing-nav{padding:16px 16px}
+  .landing-nav .logo .tagline{display:none}
+  .hero{padding:48px 16px 32px}
+  .features{padding:0 16px 32px;gap:12px}
+  .login-page{padding:16px}
+  .login-card{padding:26px 20px}
+  .hero-sub{font-size:15px}
+  .topbar-right .topbar-theme{width:36px;height:36px}
+  .side-user .user-email{font-size:11px}
+}
