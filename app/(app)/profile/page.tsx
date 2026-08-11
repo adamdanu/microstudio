@@ -61,7 +61,7 @@ export default function ProfilePage() {
     <section className="card" style={{ maxWidth: 680, margin: "0 auto" }}>
         <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", marginBottom: 14 }}>{t("profile")}</h3>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 8 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 8 }}>
           <div className="field">
             <label>Email</label>
             <input type="email" value={acc?.email || ""} readOnly style={{ opacity: .7 }} />

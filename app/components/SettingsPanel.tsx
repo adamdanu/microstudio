@@ -100,7 +100,7 @@ export function SettingsPanel() {
     <section className="card" style={{ maxWidth: 860, margin: "0 auto" }}>
       <h3 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".5px", color: "var(--muted)", marginBottom: 16 }}>{t("settingsTitle")}</h3>
       {loading ? <div className="empty"><span className="spinner" /></div> : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
           <div>
             <label style={{ fontSize: 12, color: "var(--muted)", display: "block", marginBottom: 8 }}>{t("fallbackPriority")}</label>
             <div className="card" style={{ padding: 12, minHeight: 320 }}>
@@ -144,7 +144,7 @@ export function SettingsPanel() {
                   <label>{t("apiKey")} ({p.envVar})</label>
                   <input type="password" value={c.apiKey || ""} placeholder={c.apiKey?.startsWith("••••") ? t("enterNewKey") : "sk-..."} onChange={e => update("apiKey", e.target.value)} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
                   {models.length > 0 ? (
                     <div className="field">
                       <label>{t("model")}</label>
