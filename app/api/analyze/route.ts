@@ -27,23 +27,35 @@ export async function POST(req: Request) {
     // If the user is assigned to a Gemini key pool, use it (round-robin + relay).
     const pool = await getUserPool(user.id)
     if (pool) {
-      const sel = await selectKey(pool.id)
-      if (!sel) {
-        return NextResponse.json({ error: 'Gemini key pool has no usable keys. Contact admin.' }, { status: 503 })
+      // Try each usable key until one succeeds for this image. A key that fails
+      // (quota/5xx) is cooldown-marked by markKeyFailure, so the next selectKey
+      // returns the next usable key. Bounded by pool key count.
+      let lastErr: unknown = null
+      let lastMsg = ''
+      for (let i = 0; i < 8; i++) {
+        const sel = await selectKey(pool.id)
+        if (!sel) break
+        activeKeyId = sel.key.id
+        try {
+          const result = await generateMetadataDual(image, mimeType || 'image/png', sel.config)
+          await markKeySuccess(sel.key.id)
+          activeKeyId = null
+          const { usage, ...packs } = result
+          await recordAnalysis(user.id, 'SUCCESS', usage?.tokensIn ?? 0, usage?.tokensOut ?? 0).catch(() => {})
+          return NextResponse.json({ ...packs, provider: 'gemini-pool' })
+        } catch (e) {
+          lastErr = e
+          lastMsg = e instanceof Error ? e.message : 'Failed to analyze'
+          await markKeyFailure(sel.key.id, lastMsg)
+          activeKeyId = null
+          console.error(e)
+        }
       }
-      activeKeyId = sel.key.id
-      try {
-        const result = await generateMetadataDual(image, mimeType || 'image/png', sel.config)
-        await markKeySuccess(sel.key.id)
-        const { usage, ...packs } = result
-        await recordAnalysis(user.id, 'SUCCESS', usage?.tokensIn ?? 0, usage?.tokensOut ?? 0).catch(() => {})
-        return NextResponse.json({ ...packs, provider: 'gemini-pool' })
-      } catch (e) {
-        await markKeyFailure(sel.key.id, e instanceof Error ? e.message : String(e))
-        console.error(e)
-        const msg = e instanceof Error ? e.message : 'Failed to analyze'
+      if (lastErr) {
+        const msg = lastMsg || (lastErr instanceof Error ? lastErr.message : 'Failed to analyze')
         return NextResponse.json({ error: msg }, { status: 500 })
       }
+      return NextResponse.json({ error: 'Gemini key pool has no usable keys. Contact admin.' }, { status: 503 })
     }
 
     // Auto-pick the active provider by fallback priority when none specified

@@ -31,10 +31,16 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (keys.length === 0) return NextResponse.json({ error: "Add at least one API key" }, { status: 400 })
   const model = (body.model || "").trim() || pool.keys[0]?.model || "gemini-2.5-flash"
 
+  const existing = await prisma.geminiKey.findMany({ where: { poolId: id }, select: { apiKey: true } })
+  const seen = new Set(existing.map(k => k.apiKey))
+  const fresh = keys.filter(k => !seen.has(k))
+  if (fresh.length === 0) return NextResponse.json({ error: "These API keys are already in the pool" }, { status: 400 })
+  const skipped = keys.length - fresh.length
+
   await prisma.geminiKey.createMany({
-    data: keys.map(apiKey => ({ poolId: id, apiKey, model })),
+    data: fresh.map(apiKey => ({ poolId: id, apiKey, model })),
   })
 
-  await recordActivity(admin.id, "pool_key_add", `Added ${keys.length} key(s) to pool ${pool.name}`)
-  return NextResponse.json({ ok: true, added: keys.length }, { status: 201 })
+  await recordActivity(admin.id, "pool_key_add", `Added ${fresh.length} key(s) to pool ${pool.name}`)
+  return NextResponse.json({ ok: true, added: fresh.length, skipped }, { status: 201 })
 }

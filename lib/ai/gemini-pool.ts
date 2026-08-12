@@ -15,6 +15,7 @@ export type PoolSelection = {
 } | null
 
 const COOLDOWN_BASE_MS = 30_000
+const QUOTA_COOLDOWN_MS = 60_000
 
 // Pick the next usable key (least-recently-used, skipping cooled-down/inactive),
 // and return it together with an openai-compatible config routed through the relay.
@@ -60,8 +61,9 @@ export async function selectKey(poolId: string): Promise<PoolSelection> {
 //   fatal    (403 denied, 401, 400 invalid key) → auto-disable the key so the
 //            pool stops selecting it; it can be re-enabled by the admin after
 //            the key is fixed/replaced.
-//   quota    (429 / RESOURCE_EXHAUSTED / quota) → project-wide, no per-key
-//            cooldown benefit; keep usable but count the attempt.
+//   quota    (429 / RESOURCE_EXHAUSTED / quota) → each key is its own Google
+//            project/quota, so cooldown (~60s) + bump lastUsedAt so LRU rotates
+//            to another key that still has capacity.
 //   transient (5xx, timeouts) → cooldown with exponential backoff.
 export async function markKeyFailure(keyId: string, errMsg?: string): Promise<void> {
   try {
@@ -82,10 +84,16 @@ export async function markKeyFailure(keyId: string, errMsg?: string): Promise<vo
     }
 
     if (isQuota) {
-      // Project-wide quota: keep the key usable, just count the attempt.
+      // Per-key quota: cooldown briefly so selectKey rotates to the next key
+      // (bumping lastUsedAt pushes it to the LRU back), then retry there.
       await prisma.geminiKey.update({
         where: { id: keyId },
-        data: { requestCount: { increment: 1 } },
+        data: {
+          consecutiveFails: key.consecutiveFails + 1,
+          cooldownUntil: new Date(Date.now() + QUOTA_COOLDOWN_MS),
+          lastUsedAt: new Date(),
+          requestCount: { increment: 1 },
+        },
       })
       return
     }
