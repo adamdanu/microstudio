@@ -56,19 +56,33 @@ export async function selectKey(poolId: string): Promise<PoolSelection> {
   }
 }
 
-// Mark a key as failed (429/5xx): back off exponentially and increment the counter.
-// Mark a key as failed. Transient errors (5xx) get cooldown so traffic shifts to
-// another key. Quota/authorization errors (429 quota, 403, 400 invalid key) are
-// project-wide, not per-key blips — cooldown is pointless, so leave the key active
-// and surface the real error instead of masking it as "no usable keys".
+// Classify a key failure and react accordingly:
+//   fatal    (403 denied, 401, 400 invalid key) → auto-disable the key so the
+//            pool stops selecting it; it can be re-enabled by the admin after
+//            the key is fixed/replaced.
+//   quota    (429 / RESOURCE_EXHAUSTED / quota) → project-wide, no per-key
+//            cooldown benefit; keep usable but count the attempt.
+//   transient (5xx, timeouts) → cooldown with exponential backoff.
 export async function markKeyFailure(keyId: string, errMsg?: string): Promise<void> {
   try {
     const key = await prisma.geminiKey.findUnique({ where: { id: keyId } })
     if (!key) return
 
-    const transient = !/\b(429|403|400|quota|denied|PERMISSION_DENIED|RESOURCE_EXHAUSTED)\b/i.test(errMsg || "")
-    if (!transient) {
-      // quota/denied: keep key usable, don't cooldown, but still count the attempt
+    const m = (errMsg || "").replace(/\s+/g, " ").slice(0, 500)
+    const isFatal = /\b(403|401|400)\b/.test(m) || /(denied|invalid api key|API_KEY_INVALID|PERMISSION_DENIED|UNAUTHENTICATED|INVALID_ARGUMENT)/i.test(m)
+    const isQuota = /\b429\b/.test(m) || /(quota|RESOURCE_EXHAUSTED|exceeded your current quota)/i.test(m)
+
+    if (isFatal) {
+      // Permanently bad key — stop selecting it so the batch doesn't burn time.
+      await prisma.geminiKey.update({
+        where: { id: keyId },
+        data: { isActive: false, requestCount: { increment: 1 } },
+      })
+      return
+    }
+
+    if (isQuota) {
+      // Project-wide quota: keep the key usable, just count the attempt.
       await prisma.geminiKey.update({
         where: { id: keyId },
         data: { requestCount: { increment: 1 } },
