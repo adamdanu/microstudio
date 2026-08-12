@@ -21,6 +21,7 @@ type Pool = {
   relayUrl: string | null
   createdAt: string
   assignedUsers: number
+  users: { id: string; email: string }[]
   keys: PoolKey[]
 }
 
@@ -45,6 +46,11 @@ export function KeyPoolsPanel() {
   const [assignAll, setAssignAll] = useState(false)
   const [assignIds, setAssignIds] = useState<string[]>([])
   const [users, setUsers] = useState<{ id: string; email: string }[]>([])
+
+  // add key to existing pool
+  const [addKeyPool, setAddKeyPool] = useState<Pool | null>(null)
+  const [addKeysText, setAddKeysText] = useState("")
+  const [addKeyModel, setAddKeyModel] = useState("")
 
   const load = async () => {
     setLoading(true); setErr(null)
@@ -113,6 +119,30 @@ export function KeyPoolsPanel() {
     else setErr(d.error || "Failed")
   }
 
+  async function unassignUsers(poolId: string, userIds: string[], label: string) {
+    if (!window.confirm(`Unassign ${label} from this pool? They will use their own AI connection.`)) return
+    const res = await fetch(`/api/admin/key-pools/${poolId}/assignment`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userIds }),
+    })
+    const d = await res.json()
+    if (res.ok) { setMsg(`Unassigned ${d.unassigned} user(s)`); await load() }
+    else setErr(d.error || "Failed")
+  }
+
+  async function saveAddKeys() {
+    if (!addKeyPool) return
+    const res = await fetch(`/api/admin/key-pools/${addKeyPool.id}/keys`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keys: addKeysText.split("\n"), model: addKeyModel || addKeyPool.keys[0]?.model || "" }),
+    })
+    const d = await res.json()
+    if (res.ok) { setMsg(`Added ${d.added} key(s)`); setAddKeyPool(null); setAddKeysText(""); setAddKeyModel(""); await load() }
+    else setErr(d.error || "Failed")
+  }
+
   return (
     <section className="card">
       <div className="results-head">
@@ -161,12 +191,26 @@ export function KeyPoolsPanel() {
             </button>
             <div style={{ display: "flex", gap: 6 }}>
               <button style={{ fontSize: 12 }} onClick={() => openAssign(p)}><UserPlus size={14} /> Assign</button>
+              <button style={{ fontSize: 12 }} onClick={() => { setAddKeyPool(p); setAddKeysText(""); setAddKeyModel("") }}><Plus size={14} /> Add key</button>
+              {p.users.length > 0 && <button style={{ fontSize: 12, color: "var(--danger)" }} onClick={() => unassignUsers(p.id, [], "all users")}>Unassign all</button>}
               <button style={{ fontSize: 12, color: "var(--danger)" }} onClick={() => deletePool(p)}><Trash2 size={14} /> Delete</button>
             </div>
           </div>
 
           {expanded[p.id] && (
             <div style={{ marginTop: 10 }}>
+              {p.users.length > 0 && (
+                <div style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 12, color: "var(--muted)" }}>Assigned to:</span>
+                  {p.users.map(u => (
+                    <span key={u.id} className="pill-tag" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      {u.email}
+                      <button title="Unassign" style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", padding: 0, lineHeight: 1 }} onClick={() => unassignUsers(p.id, [u.id], u.email)}>×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {p.users.length === 0 && <p style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>No users assigned — users with this pool use their own AI connection.</p>}
               <table className="admin-table">
                 <thead><tr><th>Key</th><th>Model</th><th>Status</th><th>Last used</th><th>Success</th><th>Fails</th><th></th></tr></thead>
                 <tbody>
@@ -200,6 +244,26 @@ export function KeyPoolsPanel() {
         </div>
       ))}
       {!loading && pools.length === 0 && <div className="empty">No Gemini key pools yet. Create one above.</div>}
+
+      {addKeyPool && (
+        <div className="modal-bg" onClick={e => { if (e.target === e.currentTarget) setAddKeyPool(null) }}>
+          <div className="modal" style={{ maxWidth: 440 }}>
+            <h2>Add keys to: {addKeyPool.name}</h2>
+            <div className="field" style={{ marginBottom: 12 }}>
+              <label>API keys (one per line)</label>
+              <textarea className="login-input" rows={4} value={addKeysText} onChange={e => setAddKeysText(e.target.value)} placeholder={"AIza...\nAIza..."} required />
+            </div>
+            <div className="field" style={{ marginBottom: 12 }}>
+              <label>Model (optional, defaults to pool model)</label>
+              <input className="login-input" value={addKeyModel} onChange={e => setAddKeyModel(e.target.value)} placeholder={addKeyPool.keys[0]?.model || "gemini-2.5-flash"} />
+            </div>
+            <div className="actions" style={{ justifyContent: "flex-end" }}>
+              <button onClick={() => setAddKeyPool(null)}>Cancel</button>
+              <button className="primary" onClick={saveAddKeys} disabled={!addKeysText.trim()}>Add keys</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {assignPool && (
         <div className="modal-bg" onClick={e => { if (e.target === e.currentTarget) setAssignPool(null) }}>

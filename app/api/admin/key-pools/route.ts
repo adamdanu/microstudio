@@ -22,7 +22,7 @@ export async function GET() {
   const pools = await prisma.geminiKeyPool.findMany({
     include: {
       keys: { orderBy: { createdAt: "asc" } },
-      _count: { select: { users: true } },
+      users: { select: { id: true, email: true } },
     },
     orderBy: { createdAt: "desc" },
   })
@@ -33,7 +33,8 @@ export async function GET() {
       name: p.name,
       relayUrl: p.relayUrl,
       createdAt: p.createdAt,
-      assignedUsers: p._count.users,
+      assignedUsers: p.users.length,
+      users: p.users.map(u => ({ id: u.id, email: u.email })),
       keys: p.keys.map(k => ({
         id: k.id,
         maskedKey: mask(k.apiKey),
