@@ -1,0 +1,3 @@
+{
+  "/api/admin/key-pools/[id]/keys/[kid]/route": "app/api/admin/key-pools/[id]/keys/[kid]/route.js"
+}
