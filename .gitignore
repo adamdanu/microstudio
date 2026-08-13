@@ -2,3 +2,5 @@
 .next-*
 .npm-cache
 tmp/
+skills-lock.json
+tsconfig.tsbuildinfo
