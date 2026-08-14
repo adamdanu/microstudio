@@ -4,3 +4,4 @@
 tmp/
 skills-lock.json
 tsconfig.tsbuildinfo
+node_modules
