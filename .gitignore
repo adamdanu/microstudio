@@ -5,3 +5,7 @@ tmp/
 skills-lock.json
 tsconfig.tsbuildinfo
 node_modules
+.agents/
+.windsurf/
+.claude/
+.DS_Store
